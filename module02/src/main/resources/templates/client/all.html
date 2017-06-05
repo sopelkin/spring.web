@@ -13,9 +13,9 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr>
-				<td>Williams</td>
-				<td>John</td>
+			<tr th:each="c: ${clients}">
+				<td th:text="${c.familyName}">Williams</td>
+				<td th:text="${c.firstName}">John</td>
 			</tr>
 		</tbody>
 	</table>
