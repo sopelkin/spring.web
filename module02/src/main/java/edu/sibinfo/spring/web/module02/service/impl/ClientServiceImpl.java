@@ -8,6 +8,9 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import edu.sibinfo.spring.web.module02.dao.ClientDao;
@@ -84,7 +87,7 @@ public class ClientServiceImpl implements ClientService {
 	}
 
 	@Override
-	public Iterable<Client> findAll() {
-		return clientDao.findAll();
+	public Page<Client> findAll(int page) {
+		return clientDao.findAll(new PageRequest(page, 10, new Sort("familyName", "firstName")));
 	}
 }

@@ -2,6 +2,8 @@ package edu.sibinfo.spring.web.module02.service;
 
 import java.util.function.Consumer;
 
+import org.springframework.data.domain.Page;
+
 import edu.sibinfo.spring.web.module02.dao.PhoneType;
 import edu.sibinfo.spring.web.module02.domain.Client;
 import edu.sibinfo.spring.web.module02.domain.Phone;
@@ -23,5 +25,5 @@ public interface ClientService {
 
 	Iterable<Client> search(String charactersitics);
 
-	Iterable<Client> findAll();
+	Page<Client> findAll(int page);
 }

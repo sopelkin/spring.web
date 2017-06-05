@@ -1,8 +1,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Client Listing</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<link href="/css/bootstrap.min.css" rel="stylesheet"/>
+<title>Client Listing</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link href="/css/bootstrap.min.css" rel="stylesheet" />
 </head>
 <body>
 	<table class="table table-striped table-hover">
@@ -19,5 +19,11 @@
 			</tr>
 		</tbody>
 	</table>
+	<div th:if="${currentPage} &gt; 0">
+		<a th:href="@{/client/all(page=(${currentPage} - 1))}">Предыдущая</a>
+	</div>
+	<div th:if="${currentPage} &lt; ${maxPage}">
+		<a th:href="@{/client/all(page=(${currentPage} + 1))}">Следующая</a>
+	</div>
 </body>
 </html>
