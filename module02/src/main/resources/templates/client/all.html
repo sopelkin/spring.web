@@ -5,6 +5,8 @@
 <link href="/css/bootstrap.min.css" rel="stylesheet" />
 </head>
 <body>
+	<div class="m-md-5">
+	<a href="/client/registration.html" >Регистрация</a>
 	<table class="table table-striped table-hover">
 		<thead>
 			<tr>
@@ -22,8 +24,9 @@
 	<div th:if="${currentPage} &gt; 0">
 		<a th:href="@{/client/all(page=(${currentPage} - 1))}">Предыдущая</a>
 	</div>
-	<div th:if="${currentPage} &lt; ${maxPage}">
+	<div th:if="${currentPage} &lt; (${maxPage} - 1)">
 		<a th:href="@{/client/all(page=(${currentPage} + 1))}">Следующая</a>
+	</div>
 	</div>
 </body>
 </html>

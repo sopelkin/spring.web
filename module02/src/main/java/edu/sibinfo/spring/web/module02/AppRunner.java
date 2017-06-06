@@ -7,7 +7,6 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-import edu.sibinfo.spring.web.module02.domain.Client;
 import edu.sibinfo.spring.web.module02.service.ClientService;
 
 @Component

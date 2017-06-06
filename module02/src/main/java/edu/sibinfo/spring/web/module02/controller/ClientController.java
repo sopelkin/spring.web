@@ -21,12 +21,17 @@ public class ClientController {
 		this.clientService = clientService;
 	}
 
+	@RequestMapping("/")
+	public String all(Model model) {
+		return all(0, model);
+	}
+	
 	@RequestMapping("all")
 	public String all(@RequestParam(name="page", required=false, defaultValue="0") int page, Model model) {
 		Page<Client> clientsPage = clientService.findAll(page);
 		model.addAttribute("clients", clientsPage.getContent());
 		model.addAttribute("currentPage", page);
-		model.addAttribute("maxPage", clientsPage.getTotalPages() - 1);
+		model.addAttribute("maxPage", clientsPage.getTotalPages());
 		return "client/all";
 	}
 }
