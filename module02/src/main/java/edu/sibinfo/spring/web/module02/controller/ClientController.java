@@ -4,12 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.sibinfo.spring.web.module02.domain.Client;
+import edu.sibinfo.spring.web.module02.dto.ClientDTO;
 import edu.sibinfo.spring.web.module02.dto.ClientRegistrationDTO;
 import edu.sibinfo.spring.web.module02.service.ClientService;
 
@@ -42,5 +44,18 @@ public class ClientController {
 	public String register(@ModelAttribute ClientRegistrationDTO dto, Model model) {
 		clientService.register(dto.getFirstName(), dto.getFamilyName(), dto.getRegistrationPhone());
 		return all(0, model);
+	}
+
+	@GetMapping("edit")
+	public String edit(@RequestParam(name="id") long clientId, Model model) {
+		ClientDTO clientDto = clientService.findOne(clientId);
+		model.addAttribute("client", clientDto);
+		return "client/edit";
+	}
+	
+	@PostMapping("edit")
+	public String edit(@ModelAttribute ClientDTO dto, Model model) {
+		clientService.update(dto);
+		return all(model);
 	}
 }

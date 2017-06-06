@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import edu.sibinfo.spring.web.module02.dao.PhoneType;
 import edu.sibinfo.spring.web.module02.domain.Client;
 import edu.sibinfo.spring.web.module02.domain.Phone;
+import edu.sibinfo.spring.web.module02.dto.ClientDTO;
 
 public interface ClientService {
 	Client register(String firstName, String familyName, String phone);
@@ -26,4 +27,8 @@ public interface ClientService {
 	Iterable<Client> search(String charactersitics);
 
 	Page<Client> findAll(int page);
+
+	ClientDTO findOne(long clientId);
+
+	void update(ClientDTO dto);
 }

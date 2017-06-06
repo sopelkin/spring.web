@@ -16,7 +16,7 @@
 		</thead>
 		<tbody>
 			<tr th:each="c: ${clients}">
-				<td th:text="${c.familyName}">Williams</td>
+				<td><a th:href="@{/client/edit(id=${c.id})}" th:text="${c.familyName}">Williams</a></td>
 				<td th:text="${c.firstName}">John</td>
 			</tr>
 		</tbody>

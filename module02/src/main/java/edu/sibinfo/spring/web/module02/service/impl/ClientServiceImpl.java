@@ -17,6 +17,7 @@ import edu.sibinfo.spring.web.module02.dao.ClientDao;
 import edu.sibinfo.spring.web.module02.dao.PhoneType;
 import edu.sibinfo.spring.web.module02.domain.Client;
 import edu.sibinfo.spring.web.module02.domain.Phone;
+import edu.sibinfo.spring.web.module02.dto.ClientDTO;
 import edu.sibinfo.spring.web.module02.service.ClientRegisteredEvent;
 import edu.sibinfo.spring.web.module02.service.ClientService;
 
@@ -54,7 +55,7 @@ public class ClientServiceImpl implements ClientService {
 
 	@Override
 	public void setPassword(Client client, String password) {
-		client.setPassword(encoder.digest(password.getBytes(StandardCharsets.UTF_8)));
+		client.setPasswordEncoded(encoder.digest(password.getBytes(StandardCharsets.UTF_8)));
 		clientDao.save(client);		
 	}
 
@@ -89,5 +90,23 @@ public class ClientServiceImpl implements ClientService {
 	@Override
 	public Page<Client> findAll(int page) {
 		return clientDao.findAll(new PageRequest(page, 10, new Sort("familyName", "firstName")));
+	}
+
+	@Override
+	public ClientDTO findOne(long clientId) {
+		Client client = clientDao.findOne(clientId);
+		ClientDTO dto = new ClientDTO();
+		dto.setFamilyName(client.getFamilyName());
+		dto.setFirstName(client.getFirstName());
+		dto.setId(client.getId());
+		return dto;
+	}
+
+	@Override
+	@Transactional
+	public void update(ClientDTO dto) {
+		Client client = clientDao.findOne(dto.getId());
+		client.setFamilyName(dto.getFamilyName());
+		client.setFirstName(dto.getFirstName());
 	}
 }
