@@ -10,6 +10,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -31,13 +32,15 @@ public class ClientServiceImpl implements ClientService {
 	private final ClientDao clientDao;
 	private final MessageDigest encoder;
 	private final ApplicationEventPublisher publisher;
+	private final ConversionService conversionService;  
 
 	@Autowired
-	public ClientServiceImpl(ClientDao clientDao, MessageDigest encoder, ApplicationEventPublisher publisher) {
+	public ClientServiceImpl(ClientDao clientDao, MessageDigest encoder, ConversionService conversionService, ApplicationEventPublisher publisher) {
 		super();
 		this.clientDao = clientDao;
 		this.encoder = encoder;
 		this.publisher = publisher;
+		this.conversionService = conversionService;
 	}
 
 	@Override
@@ -46,7 +49,7 @@ public class ClientServiceImpl implements ClientService {
 		Phone phone = new Phone(mobile, PhoneType.MOBILE);
 		client.addPhone(phone);
 		clientDao.save(client);
-		ClientDTO result = createDTO(client);
+		ClientDTO result = conversionService.convert(client, ClientDTO.class);
 		publisher.publishEvent(new ClientRegisteredEvent(result, createDTO(phone)));
 		return result;
 	}
@@ -75,12 +78,12 @@ public class ClientServiceImpl implements ClientService {
 
 	@Override
 	public ClientDTO findByPhone(String number) {
-		return createDTO(clientDao.findByPhone(number));
+		return conversionService.convert(clientDao.findByPhone(number), ClientDTO.class);
 	}
 
 	@Override
 	public ClientDTO findByFamilyName(String familyName) {
-		return createDTO(clientDao.findByFamilyName(familyName));
+		return conversionService.convert(clientDao.findByFamilyName(familyName), ClientDTO.class);
 	}
 
 	@Transactional
@@ -88,7 +91,7 @@ public class ClientServiceImpl implements ClientService {
 	public ClientDTO findByFamilyName(String familyName, Consumer<Client> consumer) {
 		Client c = clientDao.findByFamilyName(familyName);
 		consumer.accept(c);
-		return createDTO(c);
+		return conversionService.convert(c, ClientDTO.class);
 	}
 
 	@Override
@@ -100,7 +103,7 @@ public class ClientServiceImpl implements ClientService {
 	private List<ClientDTO> createDtoList(Iterable<Client> clients) {
 		List<ClientDTO> result = new ArrayList<>(); 
 		for (Client c : clients) {
-			result.add(createDTO(c));
+			result.add(conversionService.convert(c, ClientDTO.class));
 		}
 		return result;
 	}
@@ -120,21 +123,7 @@ public class ClientServiceImpl implements ClientService {
 
 	@Override
 	public ClientDTO findOne(long clientId) {
-		Client client = clientDao.findOne(clientId);
-		return createDTO(client);
-	}
-
-	private ClientDTO createDTO(Client client) {
-		ClientDTO dto = new ClientDTO();
-		dto.setFamilyName(client.getFamilyName());
-		dto.setFirstName(client.getFirstName());
-		dto.setId(client.getId());
-		List<PhoneDTO> phones = new ArrayList<PhoneDTO>(client.getPhones().size());
-		for (Phone phone : client.getPhones()) {
-			phones.add(createDTO(phone));
-		}
-		dto.setPhones(phones);
-		return dto;
+		return conversionService.convert(clientDao.findOne(clientId), ClientDTO.class);
 	}
 
 	private PhoneDTO createDTO(Phone phone) {

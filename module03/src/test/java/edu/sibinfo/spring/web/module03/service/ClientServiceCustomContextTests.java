@@ -11,7 +11,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Propagation;
@@ -26,7 +27,9 @@ import edu.sibinfo.spring.web.module03.dto.PhoneDTO;
 import edu.sibinfo.spring.web.module03.service.impl.SmsService;
 
 @RunWith(SpringRunner.class)
-@DataJpaTest
+@SpringBootTest
+@AutoConfigureTestDatabase
+@Transactional
 @ContextConfiguration(classes=ClientServiceCustomContextTestConfig.class)
 public class ClientServiceCustomContextTests {
 	
