@@ -60,7 +60,7 @@ public class ClientServiceCustomContextTests {
         
         List<Phone> phones = realClient.getPhones();
         assertEquals(1L, phones.size());
-        checkPhone(mobile, realClient, phones.get(0), PhoneType.MOBILE);
+        checkPhone(mobile, phones.get(0), PhoneType.MOBILE);
         
         ArgumentCaptor<ClientRegisteredEvent> captor = ArgumentCaptor.forClass(ClientRegisteredEvent.class); 
         verify(smsService).sendRegistrationNotification(captor.capture());
@@ -74,7 +74,7 @@ public class ClientServiceCustomContextTests {
 		checkClientWith3Phones(client);
 	}
 	
-	private void checkPhone(String number, Client client, Phone phone, PhoneType phoneType) {
+	private void checkPhone(String number, Phone phone, PhoneType phoneType) {
 		assertNotNull(phone);
         assertEquals(number, phone.getNumber());
         assertEquals(phoneType, phone.getPhoneType());
@@ -91,9 +91,9 @@ public class ClientServiceCustomContextTests {
 		Client realClient = dao.findOne(client.getId());
         List<Phone> phones = realClient.getPhones();
         assertEquals(3L, phones.size());
-        checkPhone(MOBILE_PHONE, client, phones.get(0), PhoneType.MOBILE);
-        checkPhone(HOME_PHONE, client, phones.get(1), PhoneType.HOME);
-        checkPhone(OFFICE_PHONE, client, phones.get(2), PhoneType.OFFICE);
+        checkPhone(MOBILE_PHONE, phones.get(0), PhoneType.MOBILE);
+        checkPhone(HOME_PHONE, phones.get(1), PhoneType.HOME);
+        checkPhone(OFFICE_PHONE, phones.get(2), PhoneType.OFFICE);
 	}
 	
 	@Test

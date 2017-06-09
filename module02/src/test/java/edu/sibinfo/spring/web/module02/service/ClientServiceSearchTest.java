@@ -12,8 +12,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import edu.sibinfo.spring.web.module02.domain.Client;
-
 @RunWith(SpringRunner.class)
 @DataJpaTest
 @ContextConfiguration(classes=ClientServiceCustomContextTestConfig.class)
@@ -66,9 +64,9 @@ public class ClientServiceSearchTest {
     	assertEquals(0, count(service.search("th W")));
     }
 
-	private int count(Iterable<Client> result) {
+	private int count(Iterable<?> result) {
 		int cnt = 0;
-		for (Iterator<Client> iterator = result.iterator(); iterator.hasNext(); iterator.next()) {
+		for (Iterator<?> iterator = result.iterator(); iterator.hasNext(); iterator.next()) {
 			++cnt;
 		}
 		return cnt;
