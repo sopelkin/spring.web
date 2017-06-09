@@ -21,6 +21,8 @@ import edu.sibinfo.spring.web.module02.dao.ClientDao;
 import edu.sibinfo.spring.web.module02.dao.PhoneType;
 import edu.sibinfo.spring.web.module02.domain.Client;
 import edu.sibinfo.spring.web.module02.domain.Phone;
+import edu.sibinfo.spring.web.module02.dto.ClientDTO;
+import edu.sibinfo.spring.web.module02.dto.PhoneDTO;
 import edu.sibinfo.spring.web.module02.service.impl.SmsService;
 
 @RunWith(SpringRunner.class)
@@ -51,7 +53,7 @@ public class ClientServiceCustomContextTests {
     }
 
 	private Client registerClient(String firstName, String familyName, String mobile) {
-		Client client = service.register(firstName, familyName, mobile);
+		ClientDTO client = service.register(firstName, familyName, mobile);
         assertEquals(1L, dao.count());
         Client realClient = dao.findOne(client.getId());
         assertNotNull(realClient);
@@ -60,40 +62,47 @@ public class ClientServiceCustomContextTests {
         
         List<Phone> phones = realClient.getPhones();
         assertEquals(1L, phones.size());
-        checkPhone(mobile, phones.get(0), PhoneType.MOBILE);
+        checkPhone(mobile, PhoneType.MOBILE, phones.get(0));
         
         ArgumentCaptor<ClientRegisteredEvent> captor = ArgumentCaptor.forClass(ClientRegisteredEvent.class); 
         verify(smsService).sendRegistrationNotification(captor.capture());
         assertSame(client, captor.getValue().getClient());
+        checkPhone(mobile, PhoneType.MOBILE, captor.getValue().getPhone());
         return realClient;
 	}
 
 	@Test 
 	public void addPhonesAllTypes() {
-		Client client = registerClientWith3Phones();
+		ClientDTO client = registerClientWith3Phones();
 		checkClientWith3Phones(client);
 	}
 	
-	private void checkPhone(String number, Phone phone, PhoneType phoneType) {
+	private static void checkPhone(String number, PhoneType phoneType, Phone phone) {
 		assertNotNull(phone);
         assertEquals(number, phone.getNumber());
         assertEquals(phoneType, phone.getPhoneType());
 	}
 	
-	private Client registerClientWith3Phones() {
-		Client client = service.register("Три", FAMILY_NAME, MOBILE_PHONE);
+	private static void checkPhone(String number, PhoneType phoneType, PhoneDTO phone) {
+		assertNotNull(phone);
+        assertEquals(number, phone.getNumber());
+        assertEquals(phoneType.name(), phone.getPhoneType());
+	}
+	
+	private ClientDTO registerClientWith3Phones() {
+		ClientDTO client = service.register("Три", FAMILY_NAME, MOBILE_PHONE);
 		service.addPhone(client, HOME_PHONE, PhoneType.HOME);
 		service.addPhone(client, OFFICE_PHONE, PhoneType.OFFICE);
 		return client;
 	}
 	
-	private void checkClientWith3Phones(Client client) {
+	private void checkClientWith3Phones(ClientDTO client) {
 		Client realClient = dao.findOne(client.getId());
         List<Phone> phones = realClient.getPhones();
         assertEquals(3L, phones.size());
-        checkPhone(MOBILE_PHONE, phones.get(0), PhoneType.MOBILE);
-        checkPhone(HOME_PHONE, phones.get(1), PhoneType.HOME);
-        checkPhone(OFFICE_PHONE, phones.get(2), PhoneType.OFFICE);
+        checkPhone(MOBILE_PHONE, PhoneType.MOBILE, phones.get(0));
+        checkPhone(HOME_PHONE, PhoneType.HOME, phones.get(1));
+        checkPhone(OFFICE_PHONE, PhoneType.OFFICE, phones.get(2));
 	}
 	
 	@Test
@@ -111,7 +120,7 @@ public class ClientServiceCustomContextTests {
 	@Test
 	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public void findClientByFamilyNameAndConsume() {
-		Client client = registerClientWith3Phones();
+		ClientDTO client = registerClientWith3Phones();
 		service.findByFamilyName(FAMILY_NAME, 
 				c -> c.getPhones().forEach(
 						p -> assertNotNull(p.getNumber())));
@@ -121,7 +130,7 @@ public class ClientServiceCustomContextTests {
 	@Test
 	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public void registerAndDeleteClient() {
-		Client client = registerClientWith3Phones();
+		ClientDTO client = registerClientWith3Phones();
 		service.deleteClient(client);
 		assertEquals(0L, dao.count());
 	}

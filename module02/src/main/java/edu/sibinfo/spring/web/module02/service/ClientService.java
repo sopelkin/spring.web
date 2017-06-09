@@ -6,27 +6,26 @@ import org.springframework.data.domain.Page;
 
 import edu.sibinfo.spring.web.module02.dao.PhoneType;
 import edu.sibinfo.spring.web.module02.domain.Client;
-import edu.sibinfo.spring.web.module02.domain.Phone;
 import edu.sibinfo.spring.web.module02.dto.ClientDTO;
 
 public interface ClientService {
-	Client register(String firstName, String familyName, String phone);
+	ClientDTO register(String firstName, String familyName, String phone);
 
-	void setPassword(Client client, String password);
+	void setPassword(ClientDTO client, String password);
 
-	Phone addPhone(Client client, String number, PhoneType phoneType);
+	void addPhone(ClientDTO client, String number, PhoneType phoneType);
 	
-	void deleteClient(Client client);
+	void deleteClient(ClientDTO client);
 	
-	Client findByPhone(String number);
+	ClientDTO findByPhone(String number);
 
-	Client findByFamilyName(String familyName);
+	ClientDTO findByFamilyName(String familyName);
 	
-	Client findByFamilyName(String familyName, Consumer<Client> consumer);
+	ClientDTO findByFamilyName(String familyName, Consumer<Client> consumer);
 
-	Iterable<Client> search(String charactersitics);
+	Iterable<ClientDTO> search(String charactersitics);
 
-	Page<Client> findAll(int page);
+	Page<ClientDTO> findAll(int page);
 
 	ClientDTO findOne(long clientId);
 

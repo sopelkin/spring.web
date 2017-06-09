@@ -7,4 +7,5 @@ public class ClientDTO {
 	private Long id;
 	private String familyName;
 	private String firstName;
+	private Iterable<PhoneDTO> phones;
 }

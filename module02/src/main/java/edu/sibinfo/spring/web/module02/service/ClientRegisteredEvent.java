@@ -1,23 +1,23 @@
 package edu.sibinfo.spring.web.module02.service;
 
-import edu.sibinfo.spring.web.module02.domain.Client;
-import edu.sibinfo.spring.web.module02.domain.Phone;
+import edu.sibinfo.spring.web.module02.dto.ClientDTO;
+import edu.sibinfo.spring.web.module02.dto.PhoneDTO;
 
 public class ClientRegisteredEvent {
-	private final Client client;
-	private final Phone phone;
+	private final ClientDTO client;
+	private final PhoneDTO phone;
 
-	public ClientRegisteredEvent(Client client, Phone phone) {
+	public ClientRegisteredEvent(ClientDTO client, PhoneDTO phone) {
 		super();
 		this.client = client;
 		this.phone = phone;
 	}
 
-	public Client getClient() {
+	public ClientDTO getClient() {
 		return client;
 	}
 
-	public Phone getPhone() {
+	public PhoneDTO getPhone() {
 		return phone;
 	}  
 }

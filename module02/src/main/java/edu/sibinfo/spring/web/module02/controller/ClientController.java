@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import edu.sibinfo.spring.web.module02.domain.Client;
 import edu.sibinfo.spring.web.module02.dto.ClientDTO;
 import edu.sibinfo.spring.web.module02.dto.ClientRegistrationDTO;
 import edu.sibinfo.spring.web.module02.service.ClientService;
@@ -33,7 +32,7 @@ public class ClientController {
 	
 	@RequestMapping("all")
 	public String all(@RequestParam(name="page", required=false, defaultValue="0") int page, Model model) {
-		Page<Client> clientsPage = clientService.findAll(page);
+		Page<ClientDTO> clientsPage = clientService.findAll(page);
 		model.addAttribute("clients", clientsPage.getContent());
 		model.addAttribute("currentPage", page);
 		model.addAttribute("maxPage", clientsPage.getTotalPages());
