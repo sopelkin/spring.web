@@ -62,11 +62,12 @@ public class ClientServiceImpl implements ClientService {
 
 	@Override
 	@Transactional
-	public void addPhone(ClientDTO clientDTO, String number, PhoneType phoneType) {
+	public ClientDTO addPhone(ClientDTO clientDTO, String number, PhoneType phoneType) {
 		Phone phone = new Phone(number, phoneType);
 		Client client = clientDao.findOne(clientDTO.getId());
 		client.addPhone(phone);
 		clientDao.save(client);
+		return conversionService.convert(client, ClientDTO.class);
 	}
 
 	@Override
@@ -120,10 +121,11 @@ public class ClientServiceImpl implements ClientService {
 
 	@Override
 	@Transactional
-	public void update(ClientDTO dto) {
+	public ClientDTO update(ClientDTO dto) {
 		Client client = clientDao.findOne(dto.getId());
 		client.setFamilyName(dto.getLastName());
 		client.setFirstName(dto.getName());
+		return conversionService.convert(client, ClientDTO.class);
 	}
 
 	private List<ClientDTO> convert(Iterable<Client> clients) {

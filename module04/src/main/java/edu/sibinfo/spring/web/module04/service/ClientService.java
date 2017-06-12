@@ -13,7 +13,7 @@ public interface ClientService {
 
 	void setPassword(ClientDTO client, String password);
 
-	void addPhone(ClientDTO client, String number, PhoneType phoneType);
+	ClientDTO addPhone(ClientDTO client, String number, PhoneType phoneType);
 	
 	void deleteClient(ClientDTO client);
 	
@@ -29,5 +29,5 @@ public interface ClientService {
 
 	ClientDTO findOne(long clientId);
 
-	void update(ClientDTO dto);
+	ClientDTO update(ClientDTO dto);
 }
