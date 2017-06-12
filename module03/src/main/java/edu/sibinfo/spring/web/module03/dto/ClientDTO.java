@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class ClientDTO {
 	private Long id;
-	private String familyName;
-	private String firstName;
+	private String lastName;
+	private String name;
 	private Iterable<PhoneDTO> phones;
 }

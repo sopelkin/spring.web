@@ -55,8 +55,8 @@ public class ConversionServiceTests {
 		ClientDTO dto = conversionService.convert(client, ClientDTO.class);
 		
 		assertNotNull(dto);
-		assertEquals(FAMILY_NAME, dto.getFamilyName());
-		assertEquals(FIRST_NAME, dto.getFirstName());
+		assertEquals(FAMILY_NAME, dto.getLastName());
+		assertEquals(FIRST_NAME, dto.getName());
 		
 		List<PhoneDTO> list = new ArrayList<PhoneDTO>(3);
 		Iterator<PhoneDTO> iterator = dto.getPhones().iterator();

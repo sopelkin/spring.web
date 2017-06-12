@@ -14,6 +14,6 @@ public class SmsService {
 	@EventListener
 	public void sendRegistrationNotification(ClientRegisteredEvent event) {
 		log.info("{} : \"{}, you were registered\"", 
-				event.getPhone().getNumber(), event.getClient().getFirstName());
+				event.getPhone().getNumber(), event.getClient().getName());
 	}
 }

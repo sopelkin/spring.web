@@ -134,7 +134,7 @@ public class ClientServiceImpl implements ClientService {
 	@Transactional
 	public void update(ClientDTO dto) {
 		Client client = clientDao.findOne(dto.getId());
-		client.setFamilyName(dto.getFamilyName());
-		client.setFirstName(dto.getFirstName());
+		client.setFamilyName(dto.getLastName());
+		client.setFirstName(dto.getName());
 	}
 }

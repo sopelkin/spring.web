@@ -18,8 +18,8 @@
 			<tbody>
 				<tr th:each="c: ${clients}">
 					<td><a th:href="@{/client/edit(id=${c.id})}"
-						th:text="${c.familyName}">Williams</a></td>
-					<td th:text="${c.firstName}">John</td>
+						th:text="${c.lastName}">Williams</a></td>
+					<td th:text="${c.name}">John</td>
 					<td><table class="table-sm">
 							<tbody>
 								<tr th:each="ph: ${c.phones}">
