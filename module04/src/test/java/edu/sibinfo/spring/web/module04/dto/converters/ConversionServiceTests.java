@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Test;
@@ -15,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import edu.sibinfo.spring.web.module04.TestUtils;
 import edu.sibinfo.spring.web.module04.dao.PhoneType;
 import edu.sibinfo.spring.web.module04.domain.Client;
 import edu.sibinfo.spring.web.module04.domain.Phone;
@@ -40,7 +39,7 @@ public class ConversionServiceTests {
 		
 		Phone phone = new Phone(MOBILE_PHONE, PhoneType.MOBILE);
 		PhoneDTO dto = conversionService.convert(phone, PhoneDTO.class);
-		assertPhone(dto, MOBILE_PHONE, PhoneType.MOBILE);
+		TestUtils.assertPhone(dto, MOBILE_PHONE, PhoneType.MOBILE);
 	}
 
 	@Test
@@ -58,19 +57,10 @@ public class ConversionServiceTests {
 		assertEquals(FAMILY_NAME, dto.getLastName());
 		assertEquals(FIRST_NAME, dto.getName());
 		
-		List<PhoneDTO> list = new ArrayList<PhoneDTO>(3);
-		Iterator<PhoneDTO> iterator = dto.getPhones().iterator();
-		while (iterator.hasNext())
-			list.add(iterator.next());
+		List<PhoneDTO> list = TestUtils.getPhoneList(dto);
 		assertEquals(3, list.size());
-		assertPhone(list.get(0), HOME_PHONE, PhoneType.HOME);
-		assertPhone(list.get(1), MOBILE_PHONE, PhoneType.MOBILE);
-		assertPhone(list.get(2), OFFICE_PHONE, PhoneType.OFFICE);
-	}
-	
-	private void assertPhone(PhoneDTO dto, String phoneNumber, PhoneType phoneType) {
-		assertNotNull(dto);
-		assertEquals(phoneNumber, dto.getNumber());
-		assertEquals(phoneType.name(), dto.getPhoneType());
+		TestUtils.assertPhone(list.get(0), HOME_PHONE, PhoneType.HOME);
+		TestUtils.assertPhone(list.get(1), MOBILE_PHONE, PhoneType.MOBILE);
+		TestUtils.assertPhone(list.get(2), OFFICE_PHONE, PhoneType.OFFICE);
 	}
 }
