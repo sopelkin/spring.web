@@ -25,6 +25,7 @@ import edu.sibinfo.spring.web.module04.dto.ClientDTO;
 import edu.sibinfo.spring.web.module04.dto.PhoneDTO;
 import edu.sibinfo.spring.web.module04.service.ClientRegisteredEvent;
 import edu.sibinfo.spring.web.module04.service.ClientService;
+import edu.sibinfo.spring.web.module04.service.ClientServiceException;
 
 @Service
 public class ClientServiceImpl implements ClientService {
@@ -64,7 +65,7 @@ public class ClientServiceImpl implements ClientService {
 	@Transactional
 	public ClientDTO addPhone(ClientDTO clientDTO, String number, PhoneType phoneType) {
 		Phone phone = new Phone(number, phoneType);
-		Client client = clientDao.findOne(clientDTO.getId());
+		Client client = findClient(clientDTO.getId());
 		client.addPhone(phone);
 		clientDao.save(client);
 		return conversionService.convert(client, ClientDTO.class);
@@ -73,7 +74,7 @@ public class ClientServiceImpl implements ClientService {
 	@Override
 	@Transactional
 	public void setPassword(ClientDTO clientDTO, String password) {
-		Client client = clientDao.findOne(clientDTO.getId());
+		Client client = findClient(clientDTO.getId());
 		client.setPasswordEncoded(encoder.digest(password.getBytes(StandardCharsets.UTF_8)));
 		clientDao.save(client);
 	}
@@ -116,13 +117,13 @@ public class ClientServiceImpl implements ClientService {
 
 	@Override
 	public ClientDTO findOne(long clientId) {
-		return convert(clientDao.findOne(clientId));
+		return convert(findClient(clientId));
 	}
 
 	@Override
 	@Transactional
 	public ClientDTO update(ClientDTO dto) {
-		Client client = clientDao.findOne(dto.getId());
+		Client client = findClient(dto.getId());
 		client.setFamilyName(dto.getLastName());
 		client.setFirstName(dto.getName());
 		return conversionService.convert(client, ClientDTO.class);
@@ -142,4 +143,10 @@ public class ClientServiceImpl implements ClientService {
 		return conversionService.convert(phone, PhoneDTO.class);
 	}
 
+	private Client findClient(long clientId) {
+		Client client = clientDao.findOne(clientId);
+		if (client == null) 
+			throw new ClientServiceException(1, "Client doesn't exist: ID=" + clientId);
+		return client;
+	}
 }

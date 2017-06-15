@@ -67,6 +67,14 @@ public class ClientServiceWebApiNoWebServer {
 				.andExpect(jsonPath("$.phones[2].phoneType").value(PhoneType.HOME.name()));
 	}
 
+	@Test
+	public void getNoId() throws Exception {
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/client/get?id=8"))
+				.andExpect(status().is5xxServerError())
+				.andExpect(jsonPath("$.code").value(1))
+				.andExpect(jsonPath("$.message").value("Client doesn't exist: ID=" + 8));
+	}
+	
     @Test
     public void register() throws Exception {
     	ClientRegistrationDTO registrationDTO = new ClientRegistrationDTO();

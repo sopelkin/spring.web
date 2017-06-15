@@ -26,6 +26,7 @@ import edu.sibinfo.spring.web.module04.dto.ClientDTO;
 import edu.sibinfo.spring.web.module04.dto.ClientRegistrationDTO;
 import edu.sibinfo.spring.web.module04.dto.PhoneDTO;
 import edu.sibinfo.spring.web.module04.service.ClientService;
+import edu.sibinfo.spring.web.module04.service.ClientServiceException;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(ClientApiController.class)
@@ -70,6 +71,16 @@ public class ClientServiceWebApiComponent {
 		   .andExpect(jsonPath("$.phones[2].phoneType").value(PhoneType.HOME.name()));
     }
     
+	@Test
+	public void getNoId() throws Exception {
+		int errorCode = 1;
+		String errorMessage = "Error message";
+    	when(clientService.findOne(anyLong())).thenThrow(new ClientServiceException(errorCode, errorMessage));
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/client/get?id=8"))
+				.andExpect(status().is5xxServerError())
+				.andExpect(jsonPath("$.code").value(errorCode))
+				.andExpect(jsonPath("$.message").value(errorMessage));
+	}    
     @Test
     public void register() throws Exception {
     	ClientDTO clientDTO = createClient();

@@ -1,6 +1,7 @@
 package edu.sibinfo.spring.web.module04.api;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -11,9 +12,11 @@ import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import edu.sibinfo.spring.web.module04.TestUtils;
+import edu.sibinfo.spring.web.module04.controller.ErrorResponse;
 import edu.sibinfo.spring.web.module04.dao.PhoneType;
 import edu.sibinfo.spring.web.module04.dto.ClientDTO;
 import edu.sibinfo.spring.web.module04.dto.ClientRegistrationDTO;
@@ -61,6 +64,18 @@ public class ClientServiceWebApiApplication {
     }
 
     @Test
+    public void getNoId() { // Id is not sent
+    	ResponseEntity<ErrorResponse> entity = restTemplate.getForEntity(composeUrl(port, "get"), ErrorResponse.class);
+    	assertBadRequest(entity);
+    }
+    
+	@Test
+    public void getBadId() { // An invalid client ID is sent
+    	ResponseEntity<ErrorResponse> entity = restTemplate.getForEntity(composeUrl(port, "get?id=3897"), ErrorResponse.class);
+    	assertNotFound(entity);
+    }
+
+    @Test
     public void updateSuccessfull() {
     	ClientDTO client = clientService.register("empty", "almostEmty", MOBILE_PHONE);
     	client.setLastName(FAMILY_NAME);
@@ -68,6 +83,20 @@ public class ClientServiceWebApiApplication {
     	ClientDTO dto = restTemplate.postForObject(composeUrl(port, "update"), client, ClientDTO.class);
     	assertClient(dto);
 		assertRegistrationPhone(dto.getPhones());
+    }
+    
+    @Test
+    public void updateNotFound() {
+    	ClientDTO client = new ClientDTO();
+    	client.setId(1298L);
+    	ResponseEntity<ErrorResponse> entity = restTemplate.postForEntity(composeUrl(port, "update"), client, ErrorResponse.class);
+    	assertNotFound(entity);
+    }
+    
+    @Test
+    public void updateBadRequest() {
+    	ResponseEntity<ErrorResponse> entity = restTemplate.postForEntity(composeUrl(port, "update"), new PhoneDTO(), ErrorResponse.class);
+    	assertServerError(entity);
     }
     
     @Test
@@ -83,6 +112,20 @@ public class ClientServiceWebApiApplication {
 		TestUtils.assertPhone(list.get(1), HOME_PHONE, PhoneType.HOME);
     }
     
+    @Test
+    public void addPhoneNotFound() {
+    	PhoneDTO additionalPhone = new PhoneDTO(HOME_PHONE, PhoneType.HOME.name());
+    	ResponseEntity<ErrorResponse> entity = restTemplate.postForEntity(composeUrl(port, "addPhone?id=56747"), additionalPhone, ErrorResponse.class);
+    	assertNotFound(entity);
+    }
+    
+    @Test
+    public void addPhoneBadRequest() {
+    	ResponseEntity<ErrorResponse> entity = restTemplate.postForEntity(composeUrl(port, "addPhone"), new ClientDTO(), ErrorResponse.class);
+    	assertBadRequest(entity);
+    }
+    
+
     private String composeUrl(int port, String method) {
 		return String.format("http://localhost:%d/api/client/%s", port, method);
 	}
@@ -99,4 +142,22 @@ public class ClientServiceWebApiApplication {
 		TestUtils.assertPhone(list.get(0), MOBILE_PHONE, PhoneType.MOBILE);
 	}
 	
+    private void assertBadRequest(ResponseEntity<ErrorResponse> entity) {
+		String message = entity.toString();
+		assertTrue(message, entity.getStatusCode().is4xxClientError());
+	}
+
+	private void assertServerError(ResponseEntity<ErrorResponse> entity) {
+		String message = entity.toString();
+		assertTrue(message, entity.getStatusCode().is5xxServerError());
+	}
+
+	private void assertNotFound(ResponseEntity<ErrorResponse> entity) {
+		String message = entity.toString();
+		assertTrue(message, entity.getStatusCode().is5xxServerError());
+    	ErrorResponse errorResponse = entity.getBody();
+    	assertNotNull(message, errorResponse);
+    	assertEquals(message, 1, errorResponse.getCode());
+	}
+
 }
