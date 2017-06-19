@@ -10,9 +10,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import edu.sibinfo.spring.web.module04.AppRunner;
 import edu.sibinfo.spring.web.module04.TestUtils;
 import edu.sibinfo.spring.web.module04.dao.PhoneType;
 import edu.sibinfo.spring.web.module04.domain.Client;
@@ -23,6 +25,8 @@ import edu.sibinfo.spring.web.module04.dto.PhoneDTO;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class ConversionServiceTests {
+	@MockBean 
+	private AppRunner appRunner;
 
     private static final String FAMILY_NAME = "LastName";
     private static final String FIRST_NAME = "FirstName";

@@ -1,48 +1,70 @@
 package edu.sibinfo.spring.web.module04;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import edu.sibinfo.spring.web.module04.dao.PhoneType;
 import edu.sibinfo.spring.web.module04.dto.ClientDTO;
-import edu.sibinfo.spring.web.module04.service.ClientService;
+import edu.sibinfo.spring.web.module04.dto.ClientRegistrationDTO;
+import edu.sibinfo.spring.web.module04.dto.PhoneDTO;
 
 @Component
 public class AppRunner implements ApplicationRunner {
-	Logger log = LoggerFactory.getLogger(AppRunner.class);
-	private final ClientService clientService;
+
+	private final RestTemplate restTemplate;
 
 	@Autowired
-	public AppRunner(ClientService clientService) {
-		this.clientService = clientService;
+	public AppRunner(RestTemplate restTemplate) {
+		this.restTemplate = restTemplate;
 	}
-
+	
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		clientService.register("Luke", "Williams", "+79239889523");
-		clientService.register("Sam", "Williams", "+79053495805");
-		ClientDTO johnSmith = clientService.register("John", "Smith", "+79132354313");
-		clientService.addPhone(johnSmith, "+79132350013", PhoneType.OFFICE);
+		register("Luke", "Williams", "+79239889523");
+		register("Sam", "Williams", "+79053495805");
+		ClientDTO johnSmith = register("John", "Smith", "+79132354313");
+		addPhone(johnSmith, "+79132350013", PhoneType.OFFICE);
 		
-		clientService.register("Joel", "Williams", "+79069409806");
-		clientService.register("Lucas", "Williams", "+79074452307");
-		ClientDTO lukeSmith = clientService.register("Luke", "Smith", "+79089872308");
-		clientService.addPhone(lukeSmith, "+79089870088", PhoneType.OFFICE);
-		clientService.addPhone(lukeSmith, "+73832870088", PhoneType.HOME);
+		register("Joel", "Williams", "+79069409806");
+		register("Lucas", "Williams", "+79074452307");
+		ClientDTO lukeSmith = register("Luke", "Smith", "+79089872308");
+		addPhone(lukeSmith, "+79089870088", PhoneType.OFFICE);
+		addPhone(lukeSmith, "+73832870088", PhoneType.HOME);
 		
-        clientService.register("Sawyer", "Smith", "+79239000023");
-		clientService.register("John", "Williams", "+79132000013");
-		ClientDTO samSmith = clientService.register("Sam", "Smith", "+79053400005");
-		clientService.addPhone(samSmith, "+73826700015", PhoneType.HOME);
-		clientService.addPhone(samSmith, "+79053400025", PhoneType.OFFICE);
-		clientService.addPhone(samSmith, "+79053400035", PhoneType.MOBILE);
+        register("Sawyer", "Smith", "+79239000023");
+		register("John", "Williams", "+79132000013");
+		ClientDTO samSmith = register("Sam", "Smith", "+79053400005");
+		addPhone(samSmith, "+73826700015", PhoneType.HOME);
+		addPhone(samSmith, "+79053400025", PhoneType.OFFICE);
+		addPhone(samSmith, "+79053400035", PhoneType.MOBILE);
 		
-		clientService.register("Joel", "Smith", "+79069450006");
-		clientService.register("Lucas", "Williams", "+79074470007");
-		clientService.register("Sawyer", "Williams", "+79089860008");
+		register("Joel", "Smith", "+79069450006");
+		register("Lucas", "Williams", "+79074470007");
+		register("Sawyer", "Williams", "+790898a60008");
+	}
+	
+	private ClientDTO register(String firstName, String familyName, String phone) throws URISyntaxException {
+		RequestEntity<ClientRegistrationDTO> request = RequestEntity
+			.post(new URI("http://localhost:8080/api/client/register"))
+			.body(new ClientRegistrationDTO(familyName, firstName, phone));
+		return restTemplate.exchange(request, ClientDTO.class).getBody();
+	}
+
+	private ClientDTO addPhone(ClientDTO client, String number, PhoneType phoneType) throws URISyntaxException {
+		URI uri = UriComponentsBuilder
+				.fromHttpUrl("http://localhost:8080/api/client/addPhone")
+				.queryParam("id", client.getId()).build().toUri();
+		RequestEntity<PhoneDTO> request = RequestEntity
+				.post(uri)
+				.body(new PhoneDTO(number, phoneType.name()));
+		return restTemplate.exchange(request, ClientDTO.class).getBody();
 	}
 }
