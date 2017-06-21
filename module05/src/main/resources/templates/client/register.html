@@ -1,0 +1,31 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Client Registration</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" />
+</head>
+<body>
+	<div class="m-md-5">
+		<form class="form-group" action="#" th:action="@{/client/register}"
+			th:object="${clientRegistrationDTO}" method="post">
+			<label for="firstName">Имя:</label> <input type="text"
+				class="form-control" th:field="*{firstName}" />
+			<div class="text-danger small"
+				th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}">First
+				name Error</div>
+			<label for="familyName">Фамилия:</label> <input type="text"
+				class="form-control" th:field="*{familyName}" />
+			<div class="text-danger small"
+				th:if="${#fields.hasErrors('familyName')}" th:errors="*{familyName}">Last
+				Name Error</div>
+			<label for="registrationPhone">Телефон:</label> <input type="text"
+				class="form-control" th:field="*{registrationPhone}" />
+			<div class="text-danger small"
+				th:if="${#fields.hasErrors('registrationPhone')}"
+				th:errors="*{registrationPhone}">Phone Error</div>
+			<button type="submit" class="btn btn-default">Submit</button>
+			<button type="reset" class="btn btn-default">Reset</button>
+		</form>
+	</div>
+</body>
+</html>
