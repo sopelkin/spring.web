@@ -3,6 +3,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.Test;
@@ -102,7 +103,7 @@ public class ClientServiceWebApiApplicationTests {
     @Test
     public void addPhoneSuccessfull() {
     	ClientDTO client = clientService.register(FIRST_NAME, FAMILY_NAME, MOBILE_PHONE);
-    	PhoneDTO additionalPhone = new PhoneDTO(HOME_PHONE, PhoneType.HOME.name());
+    	PhoneDTO additionalPhone = createHomePhone();
     	ClientDTO dto = restTemplate.postForObject(composeUrl(port, "addPhone?id=" + client.getId()), additionalPhone, ClientDTO.class);
     	assertClient(dto);
 	
@@ -111,10 +112,10 @@ public class ClientServiceWebApiApplicationTests {
 		TestUtils.assertPhone(list.get(0), MOBILE_PHONE, PhoneType.MOBILE);
 		TestUtils.assertPhone(list.get(1), HOME_PHONE, PhoneType.HOME);
     }
-    
+
     @Test
     public void addPhoneNotFound() {
-    	PhoneDTO additionalPhone = new PhoneDTO(HOME_PHONE, PhoneType.HOME.name());
+    	PhoneDTO additionalPhone = createHomePhone();
     	ResponseEntity<ErrorResponse> entity = restTemplate.postForEntity(composeUrl(port, "addPhone?id=56747"), additionalPhone, ErrorResponse.class);
     	assertNotFound(entity);
     }
@@ -160,4 +161,7 @@ public class ClientServiceWebApiApplicationTests {
     	assertEquals(message, 1, errorResponse.getCode());
 	}
 
+	private PhoneDTO createHomePhone() {
+		return new PhoneDTO(HOME_PHONE, PhoneType.HOME.name(), LocalDateTime.now());
+	}    
 }

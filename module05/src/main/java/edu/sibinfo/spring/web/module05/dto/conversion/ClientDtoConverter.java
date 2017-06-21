@@ -1,5 +1,9 @@
 package edu.sibinfo.spring.web.module05.dto.conversion;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.TimeZone;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -17,5 +21,9 @@ public abstract class ClientDtoConverter extends BaseDtoConverter<Client, Client
 	
 	public PhoneDTO convert(Phone phone) {
 		return service.convert(phone, PhoneDTO.class);
+	}
+	
+	public LocalDateTime map(Instant instant) {
+		return LocalDateTime.ofInstant(instant, TimeZone.getDefault().toZoneId());
 	}
 }

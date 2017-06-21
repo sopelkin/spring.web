@@ -1,5 +1,6 @@
 package edu.sibinfo.spring.web.module05.domain;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,6 +29,8 @@ public class Client {
 	private Long id;
 	private String familyName;
 	private String firstName;
+	@Setter(value=AccessLevel.PACKAGE)
+	private Instant registrationMoment; // TIMESTAMP in DB, by default
 	private byte[] passwordEncoded;
 	
 	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY)
@@ -44,6 +47,7 @@ public class Client {
 		this.familyName = familyName;
 		this.firstName = firstName;
 		this.phones = new ArrayList<Phone>(1);
+		this.registrationMoment = Instant.now();
 	}
 
 	public List<Phone> getPhones() {

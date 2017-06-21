@@ -5,7 +5,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
@@ -51,9 +53,9 @@ public class ClientServiceWebApiComponentTests {
     public void get() throws Exception {
     	ClientDTO clientDTO = createClient();
     	List<PhoneDTO> phones = new ArrayList<>(3);
-    	phones.add(new PhoneDTO(MOBILE_PHONE, PhoneType.MOBILE.name()));
-    	phones.add(new PhoneDTO(OFFICE_PHONE, PhoneType.OFFICE.name()));
-    	phones.add(new PhoneDTO(HOME_PHONE, PhoneType.HOME.name()));
+    	phones.add(createPhoneDTO(MOBILE_PHONE, PhoneType.MOBILE));
+    	phones.add(createPhoneDTO(OFFICE_PHONE, PhoneType.OFFICE));
+    	phones.add(createPhoneDTO(HOME_PHONE, PhoneType.HOME));
 		clientDTO.setPhones(phones);
     	when(clientService.findOne(anyLong())).thenReturn(clientDTO);
     	
@@ -70,6 +72,10 @@ public class ClientServiceWebApiComponentTests {
 		   .andExpect(jsonPath("$.phones[2].number").value(HOME_PHONE))
 		   .andExpect(jsonPath("$.phones[2].phoneType").value(PhoneType.HOME.name()));
     }
+
+	private PhoneDTO createPhoneDTO(String number, PhoneType type) {
+		return new PhoneDTO(number, type.name(), LocalDateTime.now());
+	}
     
 	@Test
 	public void getNoId() throws Exception {
@@ -84,9 +90,7 @@ public class ClientServiceWebApiComponentTests {
     @Test
     public void register() throws Exception {
     	ClientDTO clientDTO = createClient();
-    	List<PhoneDTO> phones = new ArrayList<>(3);
-    	phones.add(new PhoneDTO(MOBILE_PHONE, PhoneType.MOBILE.name()));
-		clientDTO.setPhones(phones);
+		clientDTO.setPhones(Collections.singletonList(createPhoneDTO(MOBILE_PHONE, PhoneType.MOBILE)));
 
     	when(clientService.register(FIRST_NAME, FAMILY_NAME, MOBILE_PHONE)).thenReturn(clientDTO);
 

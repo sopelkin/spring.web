@@ -12,6 +12,7 @@
 				<tr>
 					<th>Family Name</th>
 					<th>First Name</th>
+					<th>Registered</th>
 					<th>Phones</th>
 				</tr>
 			</thead>
@@ -20,11 +21,13 @@
 					<td><a th:href="@{/client/edit(id=${c.id})}"
 						th:text="${c.lastName}">Williams</a></td>
 					<td th:text="${c.name}">John</td>
+					<td th:text="${#temporals.format(c.registrationMoment, 'dd/MM/yyyy HH:mm')}">2017-08-16</td>
 					<td><table class="table-sm">
 							<tbody>
 								<tr th:each="ph: ${c.phones}">
 									<td th:text="${ph.number}">0000000</td>
 									<td th:text="${ph.phoneType}">MOBILE</td>
+									<td th:text="${#temporals.format(ph.added, 'dd/MM/yyyy HH:mm')}">2017-08-16</td>
 								</tr>
 							</tbody>
 						</table></td>
