@@ -6,7 +6,7 @@
 	<groupId>edu.sibinfo.spring.web</groupId>
 	<artifactId>module05</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 
 	<name>module05</name>
 	<description>Spring Boot Demo</description>
@@ -62,6 +62,14 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
+		
+		<!-- Remove Tomcat from target WAR -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        		
 		<!-- Miscellaneous -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
