@@ -13,13 +13,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    auth.inMemoryAuthentication().withUser("user").password("user").roles("USER")
+    auth.inMemoryAuthentication()
+        .withUser("user").password("user").roles("USER")
         .and().withUser("admin").password("admin").roles("ADMIN");
   }
 
   @Override
   public void configure(WebSecurity web) throws Exception {
-    web.ignoring().antMatchers("/css/**");
+    web.ignoring().antMatchers("/css/**", "/api/**");
   }
 
   @Override
@@ -30,12 +31,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .authorizeRequests()
         .antMatchers("/client/register").authenticated()
         .antMatchers("/client/edit").hasRole("ADMIN")
-        .antMatchers("/**").permitAll()
+        .antMatchers("/api/**", "/**").permitAll()
         .and()
         .formLogin()
         .loginPage("/login")
         .defaultSuccessUrl("/")
         .failureUrl("/login-err")
-        .permitAll();
+        .permitAll()
+        .and()
+        .logout()
+        .logoutUrl("/logout")
+        .logoutSuccessUrl("/login");
   }
 }
