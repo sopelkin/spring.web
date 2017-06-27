@@ -25,11 +25,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     http
+        .anonymous()
+        .and()
         .authorizeRequests()
         .antMatchers("/client/register").authenticated()
         .antMatchers("/client/edit").hasRole("ADMIN")
         .antMatchers("/**").permitAll()
         .and()
-        .formLogin().permitAll();
+        .formLogin()
+        .loginPage("/login")
+        .defaultSuccessUrl("/")
+        .failureUrl("/login-err")
+        .permitAll();
   }
 }

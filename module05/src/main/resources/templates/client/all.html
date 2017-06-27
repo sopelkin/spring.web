@@ -1,45 +1,57 @@
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-<title>Client Listing</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" />
+    <title>Client Listing</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
 </head>
 <body>
-	<div class="m-md-5">
-		<a th:href="@{/client/register}">Регистрация</a>
-		<table class="table">
-			<thead>
-				<tr>
-					<th>Family Name</th>
-					<th>First Name</th>
-					<th>Registered</th>
-					<th>Phones</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr th:each="c: ${clients}">
-					<td><a th:href="@{/client/edit(id=${c.id})}"
-						th:text="${c.lastName}">Williams</a></td>
-					<td th:text="${c.name}">John</td>
-					<td th:text="${#temporals.format(c.registrationMoment, 'dd/MM/yyyy HH:mm')}">2017-08-16</td>
-					<td><table class="table-sm">
-							<tbody>
-								<tr th:each="ph: ${c.phones}">
-									<td th:text="${ph.number}">0000000</td>
-									<td th:text="${ph.phoneType}">MOBILE</td>
-									<td th:text="${#temporals.format(ph.added, 'dd/MM/yyyy HH:mm')}">2017-08-16</td>
-								</tr>
-							</tbody>
-						</table></td>
-				</tr>
-			</tbody>
-		</table>
-		<div th:if="${currentPage} &gt; 0">
-			<a th:href="@{/client/all(page=(${currentPage} - 1))}">Предыдущая</a>
-		</div>
-		<div th:if="${currentPage} &lt; (${maxPage} - 1)">
-			<a th:href="@{/client/all(page=(${currentPage} + 1))}">Следующая</a>
-		</div>
-	</div>
+<div class="m-md-5">
+    <div class="navbar">
+        <ul class="nav navbar-nav" style="display: inline;">
+            <li style="display: inline;">Список</li>
+            <li style="display: inline;"><a th:href="@{/client/register}">Регистрация</a></li>
+            <li sec:authorize="isAnonymous()" style="display: inline;"><a th:href="@{/login}">Вход</a></li>
+        </ul>
+        <p sec:authorize="isAuthenticated()" class="navbar-text navbar-right">
+            Hello, <span sec:authentication="name"></span>
+            , authorities:<span sec:authentication="principal.authorities"></span>
+        </p>
+    </div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Family Name</th>
+            <th>First Name</th>
+            <th>Registered</th>
+            <th>Phones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="c: ${clients}">
+            <td><a th:href="@{/client/edit(id=${c.id})}"
+                   th:text="${c.lastName}">Williams</a></td>
+            <td th:text="${c.name}">John</td>
+            <td th:text="${#temporals.format(c.registrationMoment, 'dd/MM/yyyy HH:mm')}">2017-08-16</td>
+            <td>
+                <table class="table-sm">
+                    <tbody>
+                    <tr th:each="ph: ${c.phones}">
+                        <td th:text="${ph.number}">0000000</td>
+                        <td th:text="${ph.phoneType}">MOBILE</td>
+                        <td th:text="${#temporals.format(ph.added, 'dd/MM/yyyy HH:mm')}">2017-08-16</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div th:if="${currentPage} &gt; 0">
+        <a th:href="@{/client/all(page=(${currentPage} - 1))}">Предыдущая</a>
+    </div>
+    <div th:if="${currentPage} &lt; (${maxPage} - 1)">
+        <a th:href="@{/client/all(page=(${currentPage} + 1))}">Следующая</a>
+    </div>
+</div>
 </body>
 </html>
