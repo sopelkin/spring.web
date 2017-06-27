@@ -10,7 +10,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 @AutoConfigureTestDatabase
 public class Application05Tests {
-    @Test
-    public void contextLoads() {
-    }   
+  @Test
+  public void contextLoads() {
+  }
 }
