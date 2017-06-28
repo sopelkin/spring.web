@@ -1,0 +1,25 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Client Listing</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+</head>
+<body>
+<div class="container">
+
+    <form th:action="@{/registration}" th:object="${userForm}" method="POST" enctype="application/x-www-form-urlencoded">
+        <h2 class="form-signin-heading">Регистрация</h2>
+        <div class="form-group">
+            <label>Имя</label>
+            <input th:field="*{username}" class="form-control" placeholder="Username" autofocus="autofocus"/>
+        </div>
+        <div class="form-group">
+            <label>Пароль</label>
+            <input type="password" th:field="*{password}" class="form-control" placeholder="Password"/>
+        </div>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Зарегистрироваться</button>
+    </form>
+</div>
+</body>
+</html>
+

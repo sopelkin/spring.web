@@ -9,8 +9,9 @@
     <div class="navbar">
         <ul class="nav navbar-nav" style="display: inline;">
             <li style="display: inline;">Список</li>
-            <li style="display: inline;"><a th:href="@{/client/register}">Регистрация</a></li>
+            <li style="display: inline;"><a th:href="@{/client/register}">Добавление</a></li>
             <li sec:authorize="isAnonymous()" style="display: inline;"><a th:href="@{/login}">Вход</a></li>
+            <li sec:authorize="isAnonymous()" style="display: inline;"><a th:href="@{/registration}">Регистрация</a></li>
             <li sec:authorize="isAuthenticated()" style="display: inline;"><a th:href="@{/logout}">Выход</a></li>
         </ul>
         <p sec:authorize="isAuthenticated()">
