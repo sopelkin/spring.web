@@ -1,6 +1,6 @@
-INSERT INTO User (id, username, password) VALUES
-  (2, 'user', 'user'),
-  (1, 'admin', 'admin');
+INSERT INTO User (id, username, password, email) VALUES
+  (2, 'user', 'user', 'user@email.me'),
+  (1, 'admin', 'admin', 'admin@localhost');
 
 INSERT INTO Role (id, name) VALUES
   (2, 'ROLE_USER'),
