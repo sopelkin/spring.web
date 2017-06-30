@@ -11,10 +11,11 @@ import java.util.Collection;
 @Getter
 @Setter
 @ToString
+@Table(name = "my_user")
 public class User {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE)
   private Long id;
 
   private String username;

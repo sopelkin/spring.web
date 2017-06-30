@@ -1,8 +1,8 @@
-INSERT INTO User (id, username, password, email) VALUES
+INSERT INTO my_user (id, username, password, email) VALUES
   (2, 'user', 'user', 'user@email.me'),
   (1, 'admin', 'admin', 'admin@localhost');
 
-INSERT INTO Role (id, name) VALUES
+INSERT INTO role (id, name) VALUES
   (2, 'ROLE_USER'),
   (1, 'ROLE_ADMIN');
 
