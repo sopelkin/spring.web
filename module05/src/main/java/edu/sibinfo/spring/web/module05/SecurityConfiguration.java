@@ -33,6 +33,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     auth.userDetailsService(userDetailsService).passwordEncoder(noopEncoder());
   }
 
+  @SuppressWarnings("SpringJavaAutowiringInspection")
   @Bean
   public RestOperations restTemplate(RestTemplateBuilder builder) {
     return builder.build();
@@ -63,8 +64,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     http
         .csrf().disable()
         .headers().disable()
-        .anonymous()
-        .and()
         .authorizeRequests()
         .antMatchers("/client/register").authenticated()
         .antMatchers("/client/edit").hasRole("ADMIN")
@@ -75,6 +74,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .defaultSuccessUrl("/")
         .failureUrl("/login-err")
         .permitAll()
+        .and()
+        .rememberMe()
+        .rememberMeParameter("custom-remember-me")
+        .rememberMeCookieName("CustomRememberMe")
+        .tokenValiditySeconds(5 * 60)
         .and()
         .logout()
         .logoutUrl("/logout")
