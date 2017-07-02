@@ -4,7 +4,9 @@ import edu.sibinfo.spring.web.module05.domain.PasswordResetToken;
 import edu.sibinfo.spring.web.module05.domain.User;
 import edu.sibinfo.spring.web.module05.dto.PasswordDTO;
 import edu.sibinfo.spring.web.module05.dto.UserDTO;
+import edu.sibinfo.spring.web.module05.exception.ReCaptchaInvalidException;
 import edu.sibinfo.spring.web.module05.exception.UserAlreadyExistException;
+import edu.sibinfo.spring.web.module05.service.CaptchaService;
 import edu.sibinfo.spring.web.module05.service.NotificationService;
 import edu.sibinfo.spring.web.module05.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,22 +26,29 @@ public class UserController {
   private final UserService userService;
   private final ConversionService conversionService;
   private final NotificationService notificationService;
+  private final CaptchaService captchaService;
 
   @Autowired
-  public UserController(UserService userService, ConversionService conversionService, NotificationService notificationService) {
+  public UserController(UserService userService, ConversionService conversionService, NotificationService notificationService, CaptchaService captchaService) {
     this.userService = userService;
     this.conversionService = conversionService;
     this.notificationService = notificationService;
+    this.captchaService = captchaService;
   }
 
   @GetMapping("/registration")
   public String registration(Model model) {
     model.addAttribute("userForm", new UserDTO());
+    model.addAttribute("captchaSiteKey", captchaService.getReCaptchaSite());
     return "registration";
   }
 
   @PostMapping("/registration")
-  public String registration(@ModelAttribute("userForm") @Valid UserDTO userForm) throws UserAlreadyExistException {
+  public String registration(@ModelAttribute("userForm") @Valid final UserDTO userForm, final HttpServletRequest request) throws UserAlreadyExistException, ReCaptchaInvalidException {
+    final String response = request.getParameter("g-recaptcha-response");
+    captchaService.processResponse(response, getClientIP(request));
+    //Если не поймали исключение то все хорошо, можно регистрировать.
+
     userService.registerAccount(userForm);
     userService.autologin(userForm.getUsername(), userForm.getPassword());
     return "redirect:/";
@@ -84,4 +93,11 @@ public class UserController {
     return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
   }
 
+  private String getClientIP(HttpServletRequest request) {
+    final String xfHeader = request.getHeader("X-Forwarded-For");
+    if (xfHeader == null) {
+      return request.getRemoteAddr();
+    }
+    return xfHeader.split(",")[0];
+  }
 }

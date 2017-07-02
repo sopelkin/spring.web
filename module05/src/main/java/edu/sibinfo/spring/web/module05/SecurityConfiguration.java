@@ -1,6 +1,7 @@
 package edu.sibinfo.spring.web.module05;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.client.RestOperations;
 
 @EnableWebSecurity
 @Configuration
@@ -29,11 +31,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
     auth.userDetailsService(userDetailsService).passwordEncoder(noopEncoder());
-    /*
-    auth.inMemoryAuthentication()
-        .withUser("user").password("user").roles("USER")
-        .and().withUser("admin").password("admin").roles("ADMIN");
-    */
+  }
+
+  @Bean
+  public RestOperations restTemplate(RestTemplateBuilder builder) {
+    return builder.build();
   }
 
   @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
