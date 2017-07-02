@@ -15,7 +15,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.web.client.RestOperations;
+
+import javax.sql.DataSource;
 
 @EnableWebSecurity
 @Configuration
@@ -23,9 +27,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   private final UserDetailsService userDetailsService;
 
+  private final DataSource dataSource;
+
   @Autowired
-  public SecurityConfiguration(UserDetailsService userDetailsService) {
+  public SecurityConfiguration(UserDetailsService userDetailsService, DataSource dataSource) {
     this.userDetailsService = userDetailsService;
+    this.dataSource = dataSource;
   }
 
   @Override
@@ -76,6 +83,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .permitAll()
         .and()
         .rememberMe()
+        .tokenRepository(tokenRepository())
         .rememberMeParameter("custom-remember-me")
         .rememberMeCookieName("CustomRememberMe")
         .tokenValiditySeconds(5 * 60)
@@ -83,5 +91,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .logout()
         .logoutUrl("/logout")
         .logoutSuccessUrl("/login");
+  }
+
+  private PersistentTokenRepository tokenRepository() {
+    JdbcTokenRepositoryImpl repository = new JdbcTokenRepositoryImpl();
+    repository.setDataSource(dataSource);
+    repository.setCreateTableOnStartup(true);
+    return repository;
   }
 }
