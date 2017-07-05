@@ -9,6 +9,8 @@ import org.springframework.security.access.expression.DenyAllPermissionEvaluator
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
+import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -47,7 +49,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    auth.userDetailsService(userDetailsService).passwordEncoder(noopEncoder());
+    auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
   }
 
   @SuppressWarnings("SpringJavaAutowiringInspection")
@@ -62,11 +64,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     return super.authenticationManagerBean();
   }
 
-  @Bean
   public PasswordEncoder noopEncoder() {
     return NoOpPasswordEncoder.getInstance();
   }
-
+  
+  @Bean
   public PasswordEncoder bCryptPasswordEncoder() {
     return new BCryptPasswordEncoder();
   }

@@ -1,8 +1,14 @@
 package edu.sibinfo.spring.web.module05;
 
 import edu.sibinfo.spring.web.module05.dao.PhoneType;
+import edu.sibinfo.spring.web.module05.domain.User;
 import edu.sibinfo.spring.web.module05.dto.ClientDTO;
+import edu.sibinfo.spring.web.module05.dto.UserDTO;
+import edu.sibinfo.spring.web.module05.exception.UserAlreadyExistException;
 import edu.sibinfo.spring.web.module05.service.ClientService;
+import edu.sibinfo.spring.web.module05.service.UserService;
+import lombok.SneakyThrows;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +19,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class AppRunner implements ApplicationRunner {
   private final ClientService clientService;
+  private final UserService userService;
   Logger log = LoggerFactory.getLogger(AppRunner.class);
 
   @Autowired
-  public AppRunner(ClientService clientService) {
+  public AppRunner(ClientService clientService, UserService userService) {
     this.clientService = clientService;
+    this.userService = userService;
   }
 
   @Override
@@ -43,5 +51,17 @@ public class AppRunner implements ApplicationRunner {
     clientService.register("Joel", "Smith", "+79069450006");
     clientService.register("Lucas", "Williams", "+79074470007");
     clientService.register("Sawyer", "Williams", "+79089860008");
+    
+    UserDTO u = new UserDTO();
+    u.setUsername("admin");
+    u.setPassword("admin");
+    u.setEmail("test@test.test");
+	userService.registerAccount(u);
+	
+    UserDTO a = new UserDTO();
+    a.setUsername("user");
+    a.setPassword("user");
+    a.setEmail("test@test.test");
+	userService.registerAccount(a);
   }
 }
