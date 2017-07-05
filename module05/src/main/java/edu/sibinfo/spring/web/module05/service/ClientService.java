@@ -1,8 +1,10 @@
 package edu.sibinfo.spring.web.module05.service;
 
+import java.util.Collection;
 import java.util.function.Consumer;
 
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PostFilter;
 
 import edu.sibinfo.spring.web.module05.dao.PhoneType;
 import edu.sibinfo.spring.web.module05.domain.Client;
@@ -24,8 +26,11 @@ public interface ClientService {
 	ClientDTO findByFamilyName(String familyName, Consumer<Client> consumer);
 
 	Iterable<ClientDTO> search(String charactersitics);
-
+	
 	Page<ClientDTO> findAll(int page);
+	
+	@PostFilter("hasPermission(filterObject, 'read')")
+	Collection<ClientDTO> getAll();
 
 	ClientDTO findOne(long clientId);
 

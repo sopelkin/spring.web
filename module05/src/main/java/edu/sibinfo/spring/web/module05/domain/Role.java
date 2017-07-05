@@ -21,7 +21,7 @@ public class Role {
   private Collection<User> users;
 
   @ManyToMany
-  @JoinTable(name = "roles_privileges",
+  @JoinTable(name = "role_privilege",
       joinColumns =
       @JoinColumn(name = "role_id", referencedColumnName = "id"),
       inverseJoinColumns =

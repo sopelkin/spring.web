@@ -1,6 +1,7 @@
 package edu.sibinfo.spring.web.module05.service.impl;
 
 import edu.sibinfo.spring.web.module05.dao.UserRepository;
+import edu.sibinfo.spring.web.module05.domain.Privilege;
 import edu.sibinfo.spring.web.module05.domain.Role;
 import edu.sibinfo.spring.web.module05.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,12 +32,20 @@ public class UserDetailsServiceImpl implements UserDetailsService {
   @Transactional(readOnly = true)
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     User user = userRepository.findByUsername(username);
-
+    
+    Collection<Privilege> privileges = user.getAuthorities();
     Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
-    for (Role role : user.getRoles()) {
-      grantedAuthorities.add(new SimpleGrantedAuthority(role.getName()));
+    for (Privilege privilege : privileges) {
+      grantedAuthorities.add(new SimpleGrantedAuthority(privilege.getName()));
     }
-
-    return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), grantedAuthorities);
+    for (Role role : user.getRoles()) {
+    	grantedAuthorities.add(new SimpleGrantedAuthority(role.getName()));
+    }
+    
+    return org.springframework.security.core.userdetails.User
+    	.withUsername(user.getUsername())
+    	.password(user.getPassword())
+    	.authorities(new ArrayList<>(grantedAuthorities))
+    	.build();
   }
 }

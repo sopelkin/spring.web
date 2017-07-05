@@ -36,7 +36,7 @@ public class ClientController {
 	@RequestMapping("all")
 	public String all(@RequestParam(name="page", required=false, defaultValue="0") int page, Model model) {
 		Page<ClientDTO> clientsPage = clientService.findAll(page);
-		model.addAttribute("clients", clientsPage.getContent());
+		model.addAttribute("clients", clientService.getAll());
 		model.addAttribute("currentPage", page);
 		model.addAttribute("maxPage", clientsPage.getTotalPages());
 		return "client/all";

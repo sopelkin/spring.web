@@ -2,6 +2,8 @@ package edu.sibinfo.spring.web.module05.service.impl;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -114,6 +116,16 @@ public class ClientServiceImpl implements ClientService {
 		Page<Client> domainPage = clientDao.findAll(request);
 		return new PageImpl<ClientDTO>(convert(domainPage.getContent()), request, domainPage.getTotalElements());
 	}
+	
+	@Override
+	public Collection<ClientDTO> getAll() {
+		Collection<ClientDTO> result = new ArrayList<>();
+		for(Client client: clientDao.findAll()) {
+			result.add(convert(client));
+		}
+		return result;
+	}
+	
 
 	@Override
 	public ClientDTO findOne(long clientId) {

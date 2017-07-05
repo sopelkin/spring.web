@@ -16,7 +16,8 @@
         </ul>
         <p sec:authorize="isAuthenticated()">
             Hello, <span sec:authentication="name"></span>
-            , authorities:<span sec:authentication="principal.authorities"></span>
+            , authorities:<span sec:authentication="principal.authorities">
+            </span>
         </p>
     </div>
     <table class="table">
@@ -32,7 +33,7 @@
         <tr th:each="c: ${clients}">
             <td><a th:href="@{/client/edit(id=${c.id})}"
                    th:text="${c.lastName}">Williams</a></td>
-            <td th:text="${c.name}">John</td>
+            <td><span th:text="${c.name}">John</span> <span th:text="${c.id}">2</span></td>
             <td th:text="${#temporals.format(c.registrationMoment, 'dd/MM/yyyy HH:mm')}">2017-08-16</td>
             <td>
                 <table class="table-sm">
