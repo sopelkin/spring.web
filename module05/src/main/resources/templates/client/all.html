@@ -16,8 +16,7 @@
         </ul>
         <p sec:authorize="isAuthenticated()">
             Hello, <span sec:authentication="name"></span>
-            , authorities:<span sec:authentication="principal.authorities">
-            </span>
+            , authorities:<!-- span sec:authentication="principal.authorities"></span-->
         </p>
     </div>
     <table class="table">

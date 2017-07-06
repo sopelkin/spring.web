@@ -23,7 +23,7 @@ public class ClearExpiredTokensJob {
   }
 
   //TODO: configuration value
-  @Scheduled(fixedRate = 60 * 1000)
+//  @Scheduled(fixedRate = 60 * 1000)
   public void purgeExpired() {
     log.info("ClearExpiredTokensJob is running");
     passwordTokenRepository.deleteAllExpiredSince(LocalDateTime.now());

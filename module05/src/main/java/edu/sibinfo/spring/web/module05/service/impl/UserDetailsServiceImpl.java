@@ -18,6 +18,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.security.sasl.AuthenticationException;
+
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
@@ -31,7 +33,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
   @Override
   @Transactional(readOnly = true)
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    User user = userRepository.findByUsername(username);
+	User user;
+	try {
+	  user = userRepository.findByUsername(username);
+    } catch (Exception e) {
+    	throw new UsernameNotFoundException("Not found");
+    }
+    
+    if (user == null) {
+    	throw new UsernameNotFoundException(String.format("Username '%s' not found", username));
+    }
     
     Collection<Privilege> privileges = user.getAuthorities();
     Set<GrantedAuthority> grantedAuthorities = new HashSet<>();

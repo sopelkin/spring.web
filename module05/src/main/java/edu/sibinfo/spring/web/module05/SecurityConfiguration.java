@@ -9,6 +9,7 @@ import org.springframework.security.access.expression.DenyAllPermissionEvaluator
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.config.BeanIds;
@@ -50,9 +51,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
     auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
+    auth.authenticationProvider(customAuthProvider());
+    auth.inMemoryAuthentication().withUser("inmem").password("pass").roles("USER");
   }
 
-  @SuppressWarnings("SpringJavaAutowiringInspection")
+  private AuthenticationProvider customAuthProvider() {
+	return new CustomAuthProvider();
+}
+
+@SuppressWarnings("SpringJavaAutowiringInspection")
   @Bean
   public RestOperations restTemplate(RestTemplateBuilder builder) {
     return builder.build();
@@ -84,22 +91,23 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .csrf().disable()
         .headers().disable()
         .authorizeRequests()
+        .antMatchers("/ping").authenticated()
         .antMatchers("/client/register").access("hasAuthority('AUTH2')")
         .antMatchers("/client/edit").hasRole("ADMIN")
         .antMatchers("/api/**", "/**").permitAll()
-        .and()
+      .and()
         .formLogin()
         .loginPage("/login")
         .defaultSuccessUrl("/")
         .failureUrl("/login-err")
         .permitAll()
-        .and()
+      .and()
         .rememberMe()
         .tokenRepository(tokenRepository())
         .rememberMeParameter("custom-remember-me")
         .rememberMeCookieName("CustomRememberMe")
         .tokenValiditySeconds(5 * 60)
-        .and()
+      .and()
         .logout()
         .logoutUrl("/logout")
         .logoutSuccessUrl("/login");
