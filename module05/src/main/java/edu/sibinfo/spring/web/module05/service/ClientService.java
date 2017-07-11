@@ -1,38 +1,37 @@
 package edu.sibinfo.spring.web.module05.service;
 
-import java.util.Collection;
-import java.util.function.Consumer;
-
-import org.springframework.data.domain.Page;
-import org.springframework.security.access.prepost.PostFilter;
-
 import edu.sibinfo.spring.web.module05.dao.PhoneType;
 import edu.sibinfo.spring.web.module05.domain.Client;
 import edu.sibinfo.spring.web.module05.dto.ClientDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PostFilter;
+
+import java.util.List;
+import java.util.function.Consumer;
 
 public interface ClientService {
-	ClientDTO register(String firstName, String familyName, String phone);
+  ClientDTO register(String firstName, String familyName, String phone);
 
-	void setPassword(ClientDTO client, String password);
+  void setPassword(ClientDTO client, String password);
 
-	ClientDTO addPhone(ClientDTO client, String number, PhoneType phoneType);
-	
-	void deleteClient(ClientDTO client);
-	
-	ClientDTO findByPhone(String number);
+  ClientDTO addPhone(ClientDTO client, String number, PhoneType phoneType);
 
-	ClientDTO findByFamilyName(String familyName);
-	
-	ClientDTO findByFamilyName(String familyName, Consumer<Client> consumer);
+  void deleteClient(ClientDTO client);
 
-	Iterable<ClientDTO> search(String charactersitics);
-	
-	Page<ClientDTO> findAll(int page);
-	
-	@PostFilter("hasPermission(filterObject, 'read')")
-	Collection<ClientDTO> getAll();
+  ClientDTO findByPhone(String number);
 
-	ClientDTO findOne(long clientId);
+  ClientDTO findByFamilyName(String familyName);
 
-	ClientDTO update(ClientDTO dto);
+  ClientDTO findByFamilyName(String familyName, Consumer<Client> consumer);
+
+  Iterable<ClientDTO> search(String charactersitics);
+
+  Page<ClientDTO> findAll(int page);
+
+  ClientDTO findOne(long clientId);
+
+  ClientDTO update(ClientDTO dto);
+
+  @PostFilter("hasPermission(filterObject, 'PRIVILEGE_USER')")
+  List<ClientDTO> convert(Iterable<Client> clients);
 }

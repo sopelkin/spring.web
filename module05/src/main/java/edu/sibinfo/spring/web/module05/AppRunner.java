@@ -4,11 +4,8 @@ import edu.sibinfo.spring.web.module05.dao.PhoneType;
 import edu.sibinfo.spring.web.module05.domain.User;
 import edu.sibinfo.spring.web.module05.dto.ClientDTO;
 import edu.sibinfo.spring.web.module05.dto.UserDTO;
-import edu.sibinfo.spring.web.module05.exception.UserAlreadyExistException;
 import edu.sibinfo.spring.web.module05.service.ClientService;
 import edu.sibinfo.spring.web.module05.service.UserService;
-import lombok.SneakyThrows;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,17 +48,20 @@ public class AppRunner implements ApplicationRunner {
     clientService.register("Joel", "Smith", "+79069450006");
     clientService.register("Lucas", "Williams", "+79074470007");
     clientService.register("Sawyer", "Williams", "+79089860008");
-    
-    UserDTO u = new UserDTO();
-    u.setUsername("admin");
-    u.setPassword("admin");
-    u.setEmail("test@test.test");
-	userService.registerAccount(u);
-	
-    UserDTO a = new UserDTO();
-    a.setUsername("user");
-    a.setPassword("user");
-    a.setEmail("test@test.test");
-	userService.registerAccount(a);
+
+    UserDTO admin = new UserDTO();
+    admin.setUsername("admin");
+    admin.setPassword("admin");
+    admin.setEmail("test@test.test");
+    User a = userService.registerAccount(admin);
+    userService.addRole(a, "ROLE_USER");
+    userService.addRole(a, "ROLE_ADMIN");
+
+    UserDTO user = new UserDTO();
+    user.setUsername("user");
+    user.setPassword("user");
+    user.setEmail("test@test.test");
+    User u = userService.registerAccount(user);
+    userService.addRole(u, "ROLE_USER");
   }
 }

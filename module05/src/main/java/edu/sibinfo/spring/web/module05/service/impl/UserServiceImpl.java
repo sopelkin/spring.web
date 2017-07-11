@@ -22,7 +22,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.HashSet;
 import java.util.UUID;
 
 @Service
@@ -49,14 +48,13 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void registerAccount(UserDTO userDTO) throws UserAlreadyExistException {
+  public User registerAccount(UserDTO userDTO) throws UserAlreadyExistException {
     if (accountExist(userDTO.getUsername())) {
       throw new UserAlreadyExistException("There is an account with username: " + userDTO.getUsername());
     }
     User user = conversionService.convert(userDTO, User.class);
     user.setPassword(passwordEncoder.encode(user.getPassword()));
-    user.setRoles(new HashSet<>(roleRepository.findAll()));
-    userRepository.save(user);
+    return userRepository.save(user);
   }
 
   private boolean accountExist(String username) {
@@ -108,5 +106,11 @@ public class UserServiceImpl implements UserService {
       user.setPassword(passwordEncoder.encode(password));
       userRepository.save(user);
     }
+  }
+
+  @Override
+  public User addRole(User user, String role) {
+    user.addRole(roleRepository.getRoleByName(role));
+    return userRepository.save(user);
   }
 }

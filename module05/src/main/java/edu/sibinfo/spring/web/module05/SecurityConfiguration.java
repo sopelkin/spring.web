@@ -4,22 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.access.PermissionEvaluator;
-import org.springframework.security.access.expression.DenyAllPermissionEvaluator;
-import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
-import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
@@ -27,10 +19,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.web.client.RestOperations;
-
-import edu.sibinfo.spring.web.module05.domain.Client;
-
-import java.io.Serializable;
 
 import javax.sql.DataSource;
 
@@ -43,7 +31,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   private final DataSource dataSource;
 
   @Autowired
-  public SecurityConfiguration(UserDetailsService userDetailsService, DataSource dataSource) {
+  public SecurityConfiguration(UserDetailsService userDetailsService, @SuppressWarnings("SpringJavaAutowiringInspection") DataSource dataSource) {
     this.userDetailsService = userDetailsService;
     this.dataSource = dataSource;
   }
@@ -56,10 +44,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   }
 
   private AuthenticationProvider customAuthProvider() {
-	return new CustomAuthProvider();
-}
+    return new CustomAuthProvider();
+  }
 
-@SuppressWarnings("SpringJavaAutowiringInspection")
+  @SuppressWarnings("SpringJavaAutowiringInspection")
   @Bean
   public RestOperations restTemplate(RestTemplateBuilder builder) {
     return builder.build();
@@ -74,7 +62,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   public PasswordEncoder noopEncoder() {
     return NoOpPasswordEncoder.getInstance();
   }
-  
+
   @Bean
   public PasswordEncoder bCryptPasswordEncoder() {
     return new BCryptPasswordEncoder();

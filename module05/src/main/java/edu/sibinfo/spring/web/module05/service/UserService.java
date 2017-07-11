@@ -6,7 +6,7 @@ import edu.sibinfo.spring.web.module05.dto.UserDTO;
 import edu.sibinfo.spring.web.module05.exception.UserAlreadyExistException;
 
 public interface UserService {
-  void registerAccount(UserDTO userDTO) throws UserAlreadyExistException;
+  User registerAccount(UserDTO userDTO) throws UserAlreadyExistException;
 
   User findByUsername(String username);
 
@@ -17,4 +17,6 @@ public interface UserService {
   User findUserByResetToken(String token);
 
   void changeCurrentUserPassword(String password);
+
+  User addRole(User user, String role);
 }
