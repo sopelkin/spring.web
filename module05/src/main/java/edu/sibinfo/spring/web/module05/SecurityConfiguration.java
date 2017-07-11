@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.intercept.RunAsImplAuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.BeanIds;
@@ -38,9 +39,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    auth.authenticationProvider(runAsAuthenticationProvider());
     auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
     auth.authenticationProvider(customAuthProvider());
     auth.inMemoryAuthentication().withUser("inmem").password("pass").roles("USER");
+  }
+
+  @Bean
+  public AuthenticationProvider runAsAuthenticationProvider() {
+    RunAsImplAuthenticationProvider authProvider = new RunAsImplAuthenticationProvider();
+    authProvider.setKey("MyRunAsKey");
+    return authProvider;
   }
 
   private AuthenticationProvider customAuthProvider() {
@@ -73,6 +82,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     web.ignoring().antMatchers("/css/**", "/api/**");
   }
 
+  // @formatter:off
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     http
@@ -80,7 +90,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .headers().disable()
         .authorizeRequests()
         .antMatchers("/ping").authenticated()
-        .antMatchers("/client/register").access("hasAuthority('AUTH2')")
+        .antMatchers("/client/register").access("hasAuthority('PRIVELEGE_USER')")
         .antMatchers("/client/edit").hasRole("ADMIN")
         .antMatchers("/api/**", "/**").permitAll()
       .and()
@@ -100,6 +110,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .logoutUrl("/logout")
         .logoutSuccessUrl("/login");
   }
+  // @formatter:on
 
   private PersistentTokenRepository tokenRepository() {
     JdbcTokenRepositoryImpl repository = new JdbcTokenRepositoryImpl();
