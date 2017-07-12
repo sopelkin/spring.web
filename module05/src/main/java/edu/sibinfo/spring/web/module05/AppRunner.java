@@ -54,7 +54,7 @@ public class AppRunner implements ApplicationRunner {
     admin.setPassword("admin");
     admin.setEmail("test@test.test");
     User a = userService.registerAccount(admin);
-    userService.addRole(a, "ROLE_USER");
+    //userService.addRole(a, "ROLE_USER");
     userService.addRole(a, "ROLE_ADMIN");
 
     UserDTO user = new UserDTO();
