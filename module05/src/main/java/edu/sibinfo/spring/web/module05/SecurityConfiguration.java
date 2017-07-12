@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.access.intercept.RunAsImplAuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -17,18 +18,22 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.client.RestOperations;
 
 import javax.sql.DataSource;
 
 @EnableWebSecurity
 @Configuration
+@Order(4)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   private final UserDetailsService userDetailsService;
-
   private final DataSource dataSource;
 
   @Autowired
@@ -45,8 +50,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     auth.inMemoryAuthentication().withUser("inmem").password("pass").roles("USER");
   }
 
-  @Bean
-  public AuthenticationProvider runAsAuthenticationProvider() {
+  private AuthenticationProvider runAsAuthenticationProvider() {
     RunAsImplAuthenticationProvider authProvider = new RunAsImplAuthenticationProvider();
     authProvider.setKey("MyRunAsKey");
     return authProvider;
@@ -79,7 +83,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   @Override
   public void configure(WebSecurity web) throws Exception {
-    web.ignoring().antMatchers("/css/**", "/api/**");
+    web.ignoring().antMatchers("/css/**");
   }
 
   // @formatter:off
@@ -92,7 +96,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .antMatchers("/ping").authenticated()
         .antMatchers("/client/register").access("hasAuthority('PRIVELEGE_USER')")
         .antMatchers("/client/edit").hasRole("ADMIN")
-        .antMatchers("/api/**", "/**").permitAll()
+        //.antMatchers("/api/**", "/**").permitAll()
       .and()
         .formLogin()
         .loginPage("/login")
@@ -110,12 +114,90 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .logoutUrl("/logout")
         .logoutSuccessUrl("/login");
   }
-  // @formatter:on
 
   private PersistentTokenRepository tokenRepository() {
     JdbcTokenRepositoryImpl repository = new JdbcTokenRepositoryImpl();
     repository.setDataSource(dataSource);
     repository.setCreateTableOnStartup(true);
     return repository;
+  }
+
+  @Configuration
+  @Order(1)
+  public static class AdminConfigurationAdapter extends WebSecurityConfigurerAdapter {
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+      //@formatter:off
+      http.antMatcher("/api/admin**")
+        .authorizeRequests()
+          .anyRequest().hasRole("ADMIN")
+        .and()
+          .httpBasic()
+          .authenticationEntryPoint(authenticationEntryPoint())
+        .and()
+          .exceptionHandling()
+          .accessDeniedPage("/api/403");
+      //@formatter:on
+    }
+
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+      BasicAuthenticationEntryPoint entryPoint = new BasicAuthenticationEntryPoint();
+      entryPoint.setRealmName("Admin realm");
+      return entryPoint;
+    }
+  }
+
+  @Configuration
+  @Order(2)
+  public static class UserConfigurationAdapter extends WebSecurityConfigurerAdapter {
+
+    protected void configure(HttpSecurity http) throws Exception {
+      //@formatter:off
+      http
+          .antMatcher("/api/user/**").authorizeRequests()
+          .anyRequest().hasRole("USER")
+        .and()
+          .formLogin()
+          .loginProcessingUrl("/api/log")
+          .failureUrl("/api/log?error=loginError")
+          .defaultSuccessUrl("/api/user/general")
+        .and()
+          .logout()
+          .logoutUrl("/api/logout")
+          .logoutSuccessUrl("/api/links")
+          .deleteCookies("JSESSIONID")
+        .and()
+          .exceptionHandling()
+          .defaultAuthenticationEntryPointFor(privateEntryPoint(),  new AntPathRequestMatcher("/api/user/priv**"))
+          .defaultAuthenticationEntryPointFor(entryPoint(), new AntPathRequestMatcher("/api/user/gen**"))
+          .accessDeniedPage("/api/403")
+        .and()
+          .csrf().disable();
+      //@formatter:on
+    }
+
+    @Bean
+    public AuthenticationEntryPoint entryPoint() {
+      return new LoginUrlAuthenticationEntryPoint("/api/login");
+    }
+
+    @Bean
+    public AuthenticationEntryPoint privateEntryPoint() {
+      return new LoginUrlAuthenticationEntryPoint("/api/loginPrivate");
+    }
+  }
+  // @formatter:on
+
+  @Configuration
+  @Order(3)
+  public static class App3ConfigurationAdapter extends WebSecurityConfigurerAdapter {
+
+    protected void configure(HttpSecurity http) throws Exception {
+      http.antMatcher("/api/guest**")
+          .authorizeRequests()
+          .anyRequest().permitAll();
+    }
   }
 }
