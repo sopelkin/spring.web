@@ -44,6 +44,6 @@ public class DemoPagesController {
 
   @RequestMapping("403")
   public String getAccessDeniedPage() {
-    return "403";
+    return "multiple/403";
   }
 }
