@@ -6,6 +6,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -13,9 +15,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -35,26 +40,54 @@ public class MultipleEntryPointsIntegrationTest {
 
   @Before
   public void setup() {
-    this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).addFilter(springSecurityFilterChain).build();
+    this.mockMvc = MockMvcBuilders
+        .webAppContextSetup(this.wac)
+        .apply(springSecurity())
+        .addFilter(springSecurityFilterChain)
+        .build();
   }
 
   @Test
-  public void whenTestAdminCredentials_thenOk() throws Exception {
+  @WithAnonymousUser
+  public void whenTestAdmin_thenUnauthorized() throws Exception {
     mockMvc
         .perform(get("/api/admin"))
         .andExpect(status().isUnauthorized());
+  }
 
+
+  @Test
+  @WithMockUser(roles = {"ADMIN"})
+  public void whenTestAdminCredentials_thenOk() throws Exception {
     mockMvc
-        .perform(get("/api/admin")
-            .with(httpBasic("admin", "admin")))
+        .perform(get("/api/admin"))
         .andExpect(status().isOk());
+  }
 
+  @Test
+  public void whenLoginAsUser_thenOk() throws Exception {
+    mockMvc.perform(
+        formLogin("/api/user/log")
+            .user("user")
+            .password("user"))
+        .andExpect(redirectedUrl("/api/user/general"));
+  }
+
+  @Test
+  public void whenLoginWithBadCredentials_then403() throws Exception {
+    mockMvc.perform(
+        formLogin("/api/user/log")
+            .user("fail")
+            .password("bowl"))
+        .andExpect(redirectedUrl("/api/user/log?error=loginError"));
+  }
+
+  @Test
+  @WithMockUser
+  public void whenTestMockUser_thenOk() throws Exception {
     mockMvc
-        .perform(get("/api/user/general")
-            .with(user("admin")
-                .password("admin")
-                .roles("ADMIN")))
-        .andExpect(status().isForbidden());
+        .perform(get("/api/user/general"))
+        .andExpect(status().isOk());
   }
 
   @Test
@@ -62,19 +95,13 @@ public class MultipleEntryPointsIntegrationTest {
     mockMvc
         .perform(get("/api/user/general"))
         .andExpect(status().isFound());
+  }
 
+  @Test
+  @WithMockUser
+  public void whenUserAccessAdmin_thenForbidden() throws Exception {
     mockMvc
-        .perform(get("/api/user/general")
-            .with(user("user")
-                .password("user")
-                .roles("USER")))
-        .andExpect(status().isOk());
-
-    mockMvc
-        .perform(get("/api/admin")
-            .with(user("user")
-                .password("user")
-                .roles("USER")))
+        .perform(get("/api/admin"))
         .andExpect(status().isForbidden());
   }
 
