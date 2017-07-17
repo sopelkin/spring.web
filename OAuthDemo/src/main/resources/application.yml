@@ -1,3 +1,11 @@
+security:
+  oauth2:
+    client:
+      client-id: demo
+      client-secret: demosecret
+      scope: read,write
+      auto-approve-scopes: '.*'
+
 github:
   client:
     clientId: bd1c0a783ccdd1c9b9e4
