@@ -40,11 +40,7 @@ public class MultipleEntryPointsIntegrationTest {
 
   @Before
   public void setup() {
-    this.mockMvc = MockMvcBuilders
-            .webAppContextSetup(this.wac)
-            .apply(springSecurity())
-            .addFilter(springSecurityFilterChain)
-            .build();
+    this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).apply(springSecurity()).addFilter(springSecurityFilterChain).build();
   }
 
   @Test
@@ -55,30 +51,31 @@ public class MultipleEntryPointsIntegrationTest {
             .andExpect(status().isUnauthorized());
   }
 
+
   @Test
   @WithMockUser(roles = {"ADMIN"})
   public void whenTestAdminCredentials_thenOk() throws Exception {
     mockMvc
             .perform(get("/api/admin"))
-            .andExpect(status().isOk());
+        .andExpect(status().isOk());
   }
 
   @Test
   public void whenLoginAsUser_thenOk() throws Exception {
     mockMvc.perform(
-            formLogin("/api/user/log")
-                    .user("user")
-                    .password("user"))
-            .andExpect(redirectedUrl("/api/user/general"));
+        formLogin("/api/user/log")
+            .user("user")
+            .password("user"))
+        .andExpect(redirectedUrl("/api/user/general"));
   }
 
   @Test
   public void whenLoginWithBadCredentials_then403() throws Exception {
     mockMvc.perform(
-            formLogin("/api/user/log")
-                    .user("fail")
-                    .password("bowl"))
-            .andExpect(redirectedUrl("/api/user/log?error=loginError"));
+        formLogin("/api/user/log")
+            .user("fail")
+            .password("bowl"))
+        .andExpect(redirectedUrl("/api/user/log?error=loginError"));
   }
 
   @Test
@@ -86,7 +83,7 @@ public class MultipleEntryPointsIntegrationTest {
   public void whenTestMockUser_thenOk() throws Exception {
     mockMvc
             .perform(get("/api/user/general"))
-            .andExpect(status().isOk());
+        .andExpect(status().isOk());
   }
 
   @Test
