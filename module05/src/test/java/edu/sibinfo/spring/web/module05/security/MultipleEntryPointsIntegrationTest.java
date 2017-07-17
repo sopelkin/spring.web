@@ -23,100 +23,98 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
 @SpringBootTest(classes = Application05.class)
 public class MultipleEntryPointsIntegrationTest {
 
-  @Autowired
-  private WebApplicationContext wac;
+    @Autowired
+    private WebApplicationContext wac;
 
-  @SuppressWarnings("SpringJavaAutowiringInspection")
-  @Autowired
-  private FilterChainProxy springSecurityFilterChain;
+    @SuppressWarnings("SpringJavaAutowiringInspection")
+    @Autowired
+    private FilterChainProxy springSecurityFilterChain;
 
-  private MockMvc mockMvc;
+    private MockMvc mockMvc;
 
-  @Before
-  public void setup() {
-    this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).apply(springSecurity()).addFilter(springSecurityFilterChain).build();
-  }
+    @Before
+    public void setup() {
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).apply(springSecurity()).addFilter(springSecurityFilterChain).build();
+    }
 
-  @Test
-  @WithAnonymousUser
-  public void whenTestAdmin_thenUnauthorized() throws Exception {
-    mockMvc
-            .perform(get("/api/admin"))
-            .andExpect(status().isUnauthorized());
-  }
+    @Test
+    @WithAnonymousUser
+    public void whenTestAdmin_thenUnauthorized() throws Exception {
+        mockMvc
+                .perform(get("/api/admin"))
+                .andExpect(status().isUnauthorized());
+    }
 
+    @Test
+    @WithMockUser(roles = {"ADMIN"})
+    public void whenTestAdminCredentials_thenOk() throws Exception {
+        mockMvc
+                .perform(get("/api/admin"))
+                .andExpect(status().isOk());
+    }
 
-  @Test
-  @WithMockUser(roles = {"ADMIN"})
-  public void whenTestAdminCredentials_thenOk() throws Exception {
-    mockMvc
-            .perform(get("/api/admin"))
-        .andExpect(status().isOk());
-  }
+    @Test
+    public void whenLoginAsUser_thenOk() throws Exception {
+        mockMvc.perform(
+                formLogin("/api/user/log")
+                        .user("user")
+                        .password("user"))
+                .andExpect(redirectedUrl("/api/user/general"));
+    }
 
-  @Test
-  public void whenLoginAsUser_thenOk() throws Exception {
-    mockMvc.perform(
-        formLogin("/api/user/log")
-            .user("user")
-            .password("user"))
-        .andExpect(redirectedUrl("/api/user/general"));
-  }
+    @Test
+    public void whenLoginWithBadCredentials_then403() throws Exception {
+        mockMvc.perform(
+                formLogin("/api/user/log")
+                        .user("fail")
+                        .password("bowl"))
+                .andExpect(redirectedUrl("/api/user/log?error=loginError"));
+    }
 
-  @Test
-  public void whenLoginWithBadCredentials_then403() throws Exception {
-    mockMvc.perform(
-        formLogin("/api/user/log")
-            .user("fail")
-            .password("bowl"))
-        .andExpect(redirectedUrl("/api/user/log?error=loginError"));
-  }
+    @Test
+    @WithMockUser
+    public void whenTestMockUser_thenOk() throws Exception {
+        mockMvc
+                .perform(get("/api/user/general"))
+                .andExpect(status().isOk());
+    }
 
-  @Test
-  @WithMockUser
-  public void whenTestMockUser_thenOk() throws Exception {
-    mockMvc
-            .perform(get("/api/user/general"))
-        .andExpect(status().isOk());
-  }
+    @Test
+    public void whenTestUserCredentials_thenOk() throws Exception {
+        mockMvc
+                .perform(get("/api/user/general"))
+                .andExpect(status().isFound());
+    }
 
-  @Test
-  public void whenTestUserCredentials_thenOk() throws Exception {
-    mockMvc
-            .perform(get("/api/user/general"))
-            .andExpect(status().isFound());
-  }
+    @Test
+    @WithMockUser
+    public void whenUserAccessAdmin_thenForbidden() throws Exception {
+        mockMvc
+                .perform(get("/api/admin"))
+                .andExpect(status().isForbidden());
+    }
 
-  @Test
-  @WithMockUser
-  public void whenUserAccessAdmin_thenForbidden() throws Exception {
-    mockMvc
-            .perform(get("/api/admin"))
-            .andExpect(status().isForbidden());
-  }
+    @Test
+    public void givenAnyUser_whenGetGuestPage_thenOk() throws Exception {
+        mockMvc
+                .perform(get("/api/guest"))
+                .andExpect(status().isOk());
 
-  @Test
-  public void givenAnyUser_whenGetGuestPage_thenOk() throws Exception {
-    mockMvc
-        .perform(get("/api/guest"))
-        .andExpect(status().isOk());
+        mockMvc
+                .perform(get("/api/guest")
+                        .with(user("user")
+                                .password("user")
+                                .roles("USER")))
+                .andExpect(status().isOk());
 
-    mockMvc
-        .perform(get("/api/guest")
-            .with(user("user")
-                .password("user")
-                .roles("USER")))
-        .andExpect(status().isOk());
-
-    mockMvc
-        .perform(get("/api/guest")
-            .with(httpBasic("admin", "admin")))
-        .andExpect(status().isOk());
-  }
+        mockMvc
+                .perform(get("/api/guest")
+                        .with(httpBasic("admin", "admin")))
+                .andExpect(status().isOk());
+    }
 }
