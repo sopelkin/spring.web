@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/xhtml">
+<head></head>
+<body>
+<h1>Index page</h1>
+<h2 th:if="${principal != null}">Principal:<b th:text="${principal.name}"></b></h2>
+<ul>
+    <li><a href="/admin">Admin</a></li>
+    <li><a href="/secured">Secured</a></li>
+    <li>
+        <form action="/logout" method="POST">
+            <button type="submit" formmethod="post">Logout from app</button>
+        </form>
+    </li>
+    <li><a href="/cas/logout">Logout from cas</a></li>
+</ul>
+</body>
+</html>

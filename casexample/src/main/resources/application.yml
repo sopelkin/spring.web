@@ -1,0 +1,9 @@
+cas:
+  serviceUrl: http://localhost:8080/login/cas
+  urlPrefix: https://test.scaldingspoon.org/cas/
+  loginUrl: https://test.scaldingspoon.org/cas/login
+  logoutUrl: https://test.scaldingspoon.org/cas/logout
+
+logging:
+  level:
+    org.springframework.security: DEBUG
