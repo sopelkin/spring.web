@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <include file="classpath:config/liquibase/changelog/00000000000001_sequence.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/00000000000002_audit.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/00000000000003_authority.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/00000000000004_registrant_address.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/00000000000005_registrant_passport.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/00000000000006_registrant.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/00000000000007_client_address.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/00000000000008_client_passport.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/00000000000009_client.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/00000000000010_client_authority.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/00000000000011_visitor.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/00000000000012_phone_number_verification_code.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/00000000000013_visitor_event.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/00000000000014_credit_request.xml" relativeToChangelogFile="false"/>
+
+</databaseChangeLog>

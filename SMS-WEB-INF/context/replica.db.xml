@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-lazy-init="true"
+       xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+    <!--
+        Нужно, чтоб нативные запросы Hibernate могли видеть временные таблицы, созданные средствами JDBC, если оно
+        все в рамках одного @Transaction метода
+    -->
+    <bean id="replica.transactionManager"
+          class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+        <property name="sessionFactory" ref="replica.sessionFactory"/>
+        <property name="dataSource" ref="replica.dataSource"/>
+    </bean>
+
+    <!--
+        TransactionAwareDataSourceProxy - это тоже для совместной работы JDBC и Hibernate по временным таблицам, чтоб connection у них был один
+    -->
+    <bean id="replica.dataSource" class="org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy">
+        <property name="targetDataSource">
+            <bean class="org.springframework.jndi.JndiObjectFactoryBean">
+                <property name="jndiName" value="java:comp/env/jdbc/smsfinance-replica"/>
+                <property name="lookupOnStartup" value="false"/>
+                <property name="proxyInterface" value="javax.sql.DataSource"/>
+            </bean>
+        </property>
+    </bean>
+
+    <tx:annotation-driven/>
+
+    <!-- Hibernate SessionFactory -->
+    <bean id="replica.sessionFactory"
+          class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+        <property name="dataSource">
+            <ref local="replica.dataSource"/>
+        </property>
+        <property name="packagesToScan">
+            <list>
+                <value>com.improveit.smsfinanceserver.**.model</value>
+                <value>com.improveit.smsfinanceserver.**.model.*</value>
+                <value>com.improveit.smsfinanceserver.**.model.**.*</value>
+            </list>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.cache.use_query_cache">false</prop>
+                <prop key="hibernate.cache.use_second_level_cache">false</prop>
+
+                <prop key="hibernate.transaction.flush_before_completion">true</prop>
+
+                <prop key="hibernate.cache.provider_class">org.hibernate.cache.HashtableCacheProvider</prop>
+                <prop key="hibernate.ejb.naming_strategy">org.hibernate.cfg.ImprovedNamingStrategy</prop>
+                <prop key="hibernate.connection.charSet">UTF-8</prop>
+
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+                <prop key="hibernate.show_sql">false</prop>
+                <prop key="hibernate.format_sql">false</prop>
+
+                <prop key="hibernate.jdbc.batch_size">100</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="replica.jdbcTemplate" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
+        <constructor-arg name="dataSource" ref="replica.dataSource"/>
+    </bean>
+
+</beans>

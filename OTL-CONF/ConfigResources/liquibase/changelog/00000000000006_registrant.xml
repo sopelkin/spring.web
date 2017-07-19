@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <property name="now" value="now()" dbms="h2"/>
+
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+
+    <property name="floatType" value="float4" dbms="postgresql, h2"/>
+    <property name="floatType" value="float" dbms="mysql, oracle, mssql"/>
+
+    <changeSet id="00000000000006" author="jhipster">
+        <createTable tableName="registrant">
+
+            <column name="id" type="bigint" autoIncrement="${autoIncrement}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="state" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_by" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_date" type="timestamp" defaultValueDate="${now}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="last_modified_by" type="varchar(50)"/>
+
+            <column name="last_modified_date" type="timestamp"/>
+
+            <column name="last_name" type="varchar(75)"/>
+            <column name="first_name" type="varchar(75)"/>
+            <column name="middle_name" type="varchar(75)"/>
+            <column name="birth_date" type="date"/>
+            <column name="sex" type="varchar(6)"/>
+            <column name="phone_number" type="varchar(10)"/>
+            <column name="email" type="varchar(255)"/>
+            <column name="verification_code" type="varchar(6)"/>
+            <column name="consent_to_everything" type="boolean"/>
+            <column name="consent_to_receiving_info" type="boolean"/>
+
+            <column name="registration_address_id" type="bigint">
+                <constraints
+                    foreignKeyName="registrant_registration_address_id_fkey"
+                    references="registrant_address(id)"/>
+            </column>
+
+            <column name="living_address_id" type="bigint">
+                <constraints
+                    foreignKeyName="registrant_living_address_id_fkey"
+                    references="registrant_address(id)"/>
+            </column>
+
+            <column name="passport_id" type="bigint">
+                <constraints
+                    foreignKeyName="registrant_passport_id_fkey"
+                    references="registrant_passport(id)"/>
+            </column>
+
+            <column name="snils" type="varchar(50)"/>
+            <column name="password" type="varchar(255)"/>
+
+            <column name="amount" type="int"/>
+            <column name="count_days" type="int"/>
+
+        </createTable>
+
+    </changeSet>
+
+</databaseChangeLog>

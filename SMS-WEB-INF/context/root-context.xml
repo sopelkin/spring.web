@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+       http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+       ">
+
+    <task:scheduler id="scheduler" pool-size="3"/>
+    <task:annotation-driven/>
+
+    <context:property-placeholder location="classpath*:*.properties"/>
+
+    <import resource="db.xml"/>
+
+    <!-- Root Context: defines shared resources visible to all other web components -->
+    <context:component-scan base-package="com.improveit.smsfinanceserver"/>
+
+    <import resource="security.xml"/>
+    <import resource="controllers.xml"/>
+    <import resource="replica.db.xml"/>
+    <import resource="quartz.xml"/>
+    <import resource="telephony.blacklist.db.xml"/>
+    <import resource="terrorists.xml"/>
+
+    <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="corePoolSize" value="${taskExecutor.corePoolSize}" />
+        <property name="maxPoolSize" value="${taskExecutor.maxPoolSize}" />
+        <property name="queueCapacity" value="${taskExecutor.queueCapacity}" />
+    </bean>
+
+    <bean id="mailSender" class="com.improveit.smsfinanceserver.infrastructure.mail.CustomMailSenderImpl">
+        <property name="defaultFrom" value="${mail.default.from}"/>
+        <property name="defaultEncoding" value="UTF-8"/>
+        <property name="host" value="${mail.smtp.host}"/>
+        <property name="port" value="${mail.smtp.port}"/>
+        <property name="username" value="${mail.username}"/>
+        <property name="password" value="${mail.password}"/>
+        <property name="javaMailProperties">
+            <props>
+                <prop key="mail.smtp.auth">true</prop>
+                <prop key="mail.debug">false</prop>
+                <prop key="mail.smtp.starttls.enable">true</prop>
+                <prop key="mail.smtp.quitwait">false</prop>
+                <prop key="mail.smtp.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="overdueLettersReportMailSender"
+          class="com.improveit.smsfinanceserver.infrastructure.mail.CustomMailSenderImpl">
+        <property name="defaultFrom" value="${letters.mail.default.from}"/>
+        <property name="defaultEncoding" value="UTF-8"/>
+        <property name="host" value="${letters.mail.smtp.host}"/>
+        <property name="port" value="${letters.mail.smtp.port}"/>
+        <property name="username" value="${letters.mail.username}"/>
+        <property name="password" value="${letters.mail.password}"/>
+        <property name="javaMailProperties">
+            <props>
+                <prop key="mail.smtp.auth">true</prop>
+                <prop key="mail.debug">false</prop>
+                <prop key="mail.smtp.starttls.enable">true</prop>
+                <prop key="mail.smtp.quitwait">false</prop>
+                <prop key="mail.smtp.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="brandedMailSender"
+          class="com.improveit.smsfinanceserver.infrastructure.email.service.impl.BrandedMailSenderImpl"
+          scope="prototype">
+        <property name="defaultEncoding" value="UTF-8"/>
+        <property name="javaMailProperties">
+            <props>
+                <prop key="mail.smtp.auth">true</prop>
+                <prop key="mail.debug">false</prop>
+                <prop key="mail.smtp.starttls.enable">true</prop>
+                <prop key="mail.smtp.quitwait">false</prop>
+                <prop key="mail.smtp.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="velocityEngine"
+          class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+        <property name="velocityProperties">
+            <value>
+                resource.loader=class
+                class.resource.loader.class=org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
+                output.encoding=UTF-8
+                input.encoding=UTF-8
+                default.contentType=UTF-8
+            </value>
+        </property>
+    </bean>
+
+    <bean class="com.improveit.smsfinanceserver.infrastructure.rowsource.service.RowSourceService" />
+
+</beans>

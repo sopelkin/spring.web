@@ -1,0 +1,164 @@
+e<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+            http://www.springframework.org/schema/security
+            http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+
+  <import resource="spring-security-oauth-provider.xml"/>
+
+  <http pattern="/appsApi/**" create-session="never" entry-point-ref="oauthAuthenticationEntryPoint"
+        access-decision-manager-ref="accessDecisionManager" xmlns="http://www.springframework.org/schema/security">
+    <anonymous enabled="false"/>
+    <intercept-url pattern="/appsApi/**" access="ROLE_USER"/>
+    <!-- <intercept-url pattern="/appsApi/**" requires-channel="https" access="ROLE_USER" /> -->
+
+    <custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER"/>
+    <access-denied-handler ref="oauthAccessDeniedHandler"/>
+  </http>
+
+  <http pattern="/site/**" create-session="never" entry-point-ref="oauthAuthenticationEntryPoint"
+        access-decision-manager-ref="accessDecisionManager" xmlns="http://www.springframework.org/schema/security">
+    <anonymous enabled="false"/>
+    <intercept-url pattern="/site/**" access="ROLE_USER"/>
+    <!-- <intercept-url pattern="/appsApi/**" requires-channel="https" access="ROLE_USER" /> -->
+
+    <custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER"/>
+    <access-denied-handler ref="oauthAccessDeniedHandler"/>
+  </http>
+  <http pattern="/legislative/**" create-session="never" entry-point-ref="oauthAuthenticationEntryPoint"
+        access-decision-manager-ref="accessDecisionManager" xmlns="http://www.springframework.org/schema/security">
+    <anonymous enabled="false"/>
+    <intercept-url pattern="/legislative/**" access="ROLE_USER"/>
+    <custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER"/>
+    <access-denied-handler ref="oauthAccessDeniedHandler"/>
+  </http>
+
+  <http pattern="/adjust/**" create-session="never" entry-point-ref="oauthAuthenticationEntryPoint"
+        access-decision-manager-ref="accessDecisionManager" xmlns="http://www.springframework.org/schema/security">
+    <anonymous enabled="true"/>
+    <!-- adjust ip only -->
+    <!--access="hasIpAddress('178.162.216.219')"-->
+    <intercept-url pattern="/adjust/**" />
+  </http>
+
+  <http pattern="/mobileApi/**" create-session="never" entry-point-ref="oauthAuthenticationEntryPoint"
+        access-decision-manager-ref="accessDecisionManager" xmlns="http://www.springframework.org/schema/security">
+    <anonymous enabled="false"/>
+    <intercept-url pattern="/mobileApi/**" access="ROLE_USER"/>
+    <!-- <intercept-url pattern="/appsApi/**" requires-channel="https" access="ROLE_USER" /> -->
+
+    <custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER"/>
+    <access-denied-handler ref="oauthAccessDeniedHandler"/>
+  </http>
+
+  <http pattern="/partners/**" create-session="never" entry-point-ref="oauthAuthenticationEntryPoint"
+        access-decision-manager-ref="accessDecisionManager" xmlns="http://www.springframework.org/schema/security">
+    <anonymous enabled="false"/>
+    <intercept-url pattern="/partners/**" access="ROLE_USER"/>
+    <!-- <intercept-url pattern="/appsApi/**" requires-channel="https" access="ROLE_USER" /> -->
+
+    <custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER"/>
+    <access-denied-handler ref="oauthAccessDeniedHandler"/>
+  </http>
+
+  <http pattern="/exporter/**" create-session="never" entry-point-ref="oauthAuthenticationEntryPoint"
+        access-decision-manager-ref="accessDecisionManager" xmlns="http://www.springframework.org/schema/security">
+    <anonymous enabled="false"/>
+    <intercept-url pattern="/exporter/**" access="ROLE_USER"/>
+    <!-- <intercept-url pattern="/appsApi/**" requires-channel="https" access="ROLE_USER" /> -->
+
+    <custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER"/>
+    <access-denied-handler ref="oauthAccessDeniedHandler"/>
+  </http>
+
+  <http pattern="/prunto/**" create-session="never" entry-point-ref="oauthAuthenticationEntryPoint"
+        access-decision-manager-ref="accessDecisionManager" xmlns="http://www.springframework.org/schema/security">
+    <anonymous enabled="false"/>
+    <intercept-url pattern="/prunto/**" access="ROLE_USER"/>
+    <!-- <intercept-url pattern="/appsApi/**" requires-channel="https" access="ROLE_USER" /> -->
+
+    <custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER"/>
+    <access-denied-handler ref="oauthAccessDeniedHandler"/>
+  </http>
+
+  <http pattern="/priorityLead/**" create-session="never" entry-point-ref="oauthAuthenticationEntryPoint"
+        access-decision-manager-ref="accessDecisionManager" xmlns="http://www.springframework.org/schema/security">
+    <anonymous enabled="false"/>
+    <intercept-url pattern="/priorityLead/**" access="ROLE_USER"/>
+
+    <custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER"/>
+    <access-denied-handler ref="oauthAccessDeniedHandler"/>
+  </http>
+
+  <bean id="oauthAuthenticationEntryPoint"
+        class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
+    <property name="realmName" value="smsfinanceserver"/>
+  </bean>
+
+  <bean id="accessDecisionManager" class="org.springframework.security.access.vote.UnanimousBased"
+        xmlns="http://www.springframework.org/schema/beans">
+    <constructor-arg>
+      <list>
+        <bean class="org.springframework.security.oauth2.provider.vote.ScopeVoter"/>
+        <bean class="org.springframework.security.access.vote.RoleVoter"/>
+        <bean class="org.springframework.security.access.vote.AuthenticatedVoter"/>
+      </list>
+    </constructor-arg>
+  </bean>
+
+  <authentication-manager alias="authenticationManager" xmlns="http://www.springframework.org/schema/security">
+    <authentication-provider ref="customAuthenticationProvider"/>
+  </authentication-manager>
+
+  <bean id="customAuthenticationProvider" class="com.improveit.smsfinanceserver.additional.users.security.impl.CustomAuthenticationProvider"/>
+
+  <bean id="passwordService" class="com.improveit.smsfinanceserver.registration.registration.service.impl.PasswordServiceImpl"/>
+
+  <http pattern="/login.htm" xmlns="http://www.springframework.org/schema/security" security="none"/>
+  <http pattern="/api/**" xmlns="http://www.springframework.org/schema/security" security="none"/>
+  <http pattern="/statetest.htm" xmlns="http://www.springframework.org/schema/security" security="none"/>
+
+  <http pattern="/index.html*" xmlns="http://www.springframework.org/schema/security" security="none"/>
+
+  <http pattern="/smsfinanceserver/hosted.html*" xmlns="http://www.springframework.org/schema/security"
+        security="none"/>
+
+  <http pattern="/**/*.js" xmlns="http://www.springframework.org/schema/security" security="none"/>
+
+  <http pattern="/**/*.css" xmlns="http://www.springframework.org/schema/security" security="none"/>
+
+  <http pattern="/resources/**" xmlns="http://www.springframework.org/schema/security" security="none"/>
+
+  <http pattern="/gxt/**" xmlns="http://www.springframework.org/schema/security" security="none"/>
+
+  <http pattern="/apikladr/**" xmlns="http://www.springframework.org/schema/security" security="none"/>
+
+  <http pattern="/qiwi/**" xmlns="http://www.springframework.org/schema/security" security="none"/>
+
+  <http pattern="/smsfinanceserver/atmosphere/**" xmlns="http://www.springframework.org/schema/security"
+        security="none"/>
+
+  <http auto-config='true' xmlns="http://www.springframework.org/schema/security"
+        authentication-manager-ref="defaultAuthManager">
+    <session-management>
+      <concurrency-control max-sessions="1" expired-url="/login" session-registry-ref="customSessionRegistry"/>
+    </session-management>
+
+    <intercept-url pattern="/contact_admin.htm" access="ROLE_ADMIN"/>
+    <intercept-url pattern='/**'
+                   access='ROLE_PODFT,ROLE_ATLANT_VK, ROLE_TRAINEE,ROLE_SPECIALIST_OSO,ROLE_OPERATOR,ROLE_ADMIN,ROLE_COLLECTOR_DDV2,ROLE_COLLECTOR_DDV1,ROLE_BOOKER,ROLE_SVK,ROLE_SVK_FIN_DEP,ROLE_SVK_DK,ROLE_SVK_DUO,ROLE_SVK_MARKETING,ROLE_SVK_UD,ROLE_SVK_DUP,ROLE_REPORTS,ROLE_QUALITY_CONTROL,ROLE_CHIEF_COLLECTOR,ROLE_OFFICE_MANAGER,ROLE_CHIEF_OSO,ROLE_ANALYST,ROLE_INTERNAL_CONTROL,ROLE_LITTLE_CHIEF_COLLECTOR,ROLE_READ_ONLY,ROLE_READ_ONLY_WITHOUT_REPORTS,ROLE_SKIP_TRACING,ROLE_INTER_CALLS'/>
+    <intercept-url pattern="/systemApi/**" access="ROLE_ADMIN"/>
+
+    <form-login login-page='/login.htm' default-target-url='/homepage.htm' always-use-default-target='true'/>
+
+    <remember-me key="smsfinanceserver" token-validity-seconds="86400" user-service-ref="userDetailsServiceImpl"/>
+  </http>
+
+  <authentication-manager xmlns="http://www.springframework.org/schema/security" id="defaultAuthManager">
+    <authentication-provider user-service-ref="userDetailsServiceImpl">
+      <password-encoder hash="sha"/>
+    </authentication-provider>
+  </authentication-manager>
+
+</beans>

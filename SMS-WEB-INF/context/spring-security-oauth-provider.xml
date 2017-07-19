@@ -1,0 +1,131 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+       xmlns:sec="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/security
+           http://www.springframework.org/schema/security/spring-security-3.1.xsd
+           http://www.springframework.org/schema/security/oauth2
+           http://www.springframework.org/schema/security/spring-security-oauth2-1.0.xsd">
+
+  <http pattern="/oauth/token" create-session="stateless" authentication-manager-ref="clientAuthenticationManager"
+        xmlns="http://www.springframework.org/schema/security">
+    <intercept-url pattern="/oauth/token" access="IS_AUTHENTICATED_FULLY"/>
+    <anonymous enabled="false"/>
+    <http-basic entry-point-ref="clientAuthenticationEntryPoint"/>
+    <!-- include this only if you need to authenticate clients via request parameters -->
+    <custom-filter ref="clientCredentialsTokenEndpointFilter" after="BASIC_AUTH_FILTER"/>
+    <access-denied-handler ref="oauthAccessDeniedHandler"/>
+  </http>
+
+  <bean id="clientAuthenticationEntryPoint"
+        class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
+    <property name="realmName" value="smsfinanceserver/client"/>
+    <property name="typeName" value="Basic"/>
+  </bean>
+
+  <bean id="oauthAccessDeniedHandler"
+        class="org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler"/>
+
+  <bean id="clientCredentialsTokenEndpointFilter"
+        class="org.springframework.security.oauth2.provider.client.ClientCredentialsTokenEndpointFilter">
+    <property name="authenticationManager" ref="clientAuthenticationManager"/>
+  </bean>
+
+  <bean id="customTokenGranter" class="com.improveit.smsfinanceserver.additional.users.security.impl.CustomTokenGranter">
+    <constructor-arg ref="tokenServices"/>
+    <constructor-arg ref="clientDetails"/>
+    <constructor-arg ref="authenticationManager"/>
+  </bean>
+
+  <authentication-manager id="clientAuthenticationManager" xmlns="http://www.springframework.org/schema/security">
+    <authentication-provider user-service-ref="clientDetailsUserService"/>
+  </authentication-manager>
+
+  <bean id="clientDetailsUserService"
+        class="org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService">
+    <constructor-arg ref="clientDetails"/>
+  </bean>
+
+  <!-- Used for the persistenceof tokens (currently an in memory implementation)
+  <bean id="tokenStore" class="org.springframework.security.oauth2.provider.token.InMemoryTokenStore" /> -->
+
+  <!-- Used for the persistenceof tokens (an in DB implementation) -->
+  <bean id="tokenStore" class="org.springframework.security.oauth2.provider.token.JdbcTokenStore">
+    <constructor-arg ref="dataSource"/>
+  </bean>
+
+  <bean id="tokenServices"
+        class="com.improveit.smsfinanceserver.infrastructure.webservices.api.utils.CustomTokenServices">
+    <property name="tokenStore" ref="tokenStore"/>
+    <property name="supportRefreshToken" value="true"/>
+    <property name="clientDetailsService" ref="clientDetails"/>
+  </bean>
+
+  <bean id="userApprovalHandler"
+        class="org.springframework.security.oauth2.provider.approval.TokenServicesUserApprovalHandler">
+    <property name="tokenServices" ref="tokenServices"/>
+  </bean>
+
+  <!-- authorization-server aka AuthorizationServerTokenServices is an interface that defines everything necessary for token management -->
+  <oauth:authorization-server client-details-service-ref="clientDetails" token-services-ref="tokenServices"
+                              user-approval-handler-ref="userApprovalHandler">
+    <oauth:authorization-code/>
+    <oauth:implicit/>
+    <oauth:refresh-token/>
+    <oauth:client-credentials/>
+    <oauth:custom-grant token-granter-ref="customTokenGranter"/>
+  </oauth:authorization-server>
+
+  <oauth:resource-server id="resourceServerFilter" resource-id="test" token-services-ref="tokenServices"/>
+  <!-- ClientsDeailsService: Entry Point to clients database (given is in memory implementation) -->
+  <oauth:client-details-service id="clientDetails">
+    <!-- client -->
+    <oauth:client client-id="smsfinSite" authorized-grant-types="password,authorization_code,refresh_token,implicit"
+                  secret="97ed1d9849b1_QA4" authorities="ROLE_USER" access-token-validity="1000000"/>
+
+    <oauth:client client-id="androidClient" authorized-grant-types="password,authorization_code,refresh_token,implicit"
+                  secret="~8~?vSUngV1N@F~" authorities="ROLE_USER"/>
+
+    <oauth:client client-id="iosClient" authorized-grant-types="password,authorization_code,refresh_token,implicit"
+                  secret="_3jQ2v?4-sI1dfv" authorities="ROLE_USER"/>
+
+    <oauth:client client-id="vivusSite" authorized-grant-types="password,authorization_code,refresh_token,implicit"
+                  secret="FFDS@#dds112ds" authorities="ROLE_USER" access-token-validity="1000000"/>
+
+    <oauth:client client-id="vivusAndroidClient" authorized-grant-types="password,authorization_code,refresh_token,implicit"
+                  secret="fll422__SDf~our" authorities="ROLE_USER"/>
+
+    <oauth:client client-id="vivusIOSClient" authorized-grant-types="password,authorization_code,refresh_token,implicit"
+                  secret="k46_GER___~SDGh" authorities="ROLE_USER"/>
+
+      <oauth:client client-id="partners" authorized-grant-types="password,authorization_code,refresh_token,implicit"
+                    secret="123456789012345" authorities="ROLE_USER"/>
+
+    <oauth:client client-id="prunto" authorized-grant-types="password,authorization_code,refresh_token,implicit"
+                  secret="123456789012345" authorities="ROLE_USER"/>
+
+    <oauth:client client-id="archive" authorized-grant-types="password,authorization_code,refresh_token,implicit"
+                    secret="~ArC41VE-$erv1ce~" authorities="ROLE_USER"/>
+
+    <oauth:client client-id="massChecks" authorized-grant-types="password,authorization_code,refresh_token,implicit"
+                  secret="123456789012345" authorities="ROLE_USER"/>
+
+    <oauth:client client-id="leadGateway" authorized-grant-types="password,authorization_code,refresh_token,implicit"
+                  secret="123456789012345" authorities="ROLE_USER"/>
+
+    <oauth:client client-id="exporter" authorized-grant-types="password,authorization_code,refresh_token,implicit"
+                  secret="123456789012345" authorities="ROLE_USER"/>
+
+  </oauth:client-details-service>
+
+  <sec:global-method-security pre-post-annotations="enabled" proxy-target-class="true">
+    <sec:expression-handler ref="oauthExpressionHandler"/>
+  </sec:global-method-security>
+
+  <oauth:expression-handler id="oauthExpressionHandler"/>
+
+  <oauth:web-expression-handler id="oauthWebExpressionHandler"/>
+
+</beans>

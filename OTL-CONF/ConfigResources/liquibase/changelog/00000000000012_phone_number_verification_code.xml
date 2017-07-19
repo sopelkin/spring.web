@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <property name="now" value="now()" dbms="h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+
+    <changeSet id="00000000000012" author="Pavel Taruts">
+
+        <createTable tableName="phone_number_verification_code">
+
+            <column name="id" type="bigint">
+                <constraints primaryKey="true"/>
+            </column>
+
+            <column name="created_by" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="timestamp" defaultValueDate="${now}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+
+            <column name="phone_number" type="varchar(10)"/>
+            <column name="code" type="varchar(6)"/>
+            <column name="expiration_date" type="timestamp"/>
+            <column name="approved" type="boolean"/>
+
+            <column name="visitor_id" type="BIGINT">
+                <constraints foreignKeyName="phone_number_verification_code_visitor_id_fk" referencedTableName="visitor" referencedColumnNames="id"/>
+            </column>
+        </createTable>
+
+        <createIndex indexName="idx_phone_number_verification_code_phone_number"
+                     tableName="phone_number_verification_code">
+            <column name="phone_number" type="varchar(10)"/>
+        </createIndex>
+
+    </changeSet>
+
+</databaseChangeLog>
